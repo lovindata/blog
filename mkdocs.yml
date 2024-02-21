@@ -1,0 +1,34 @@
+site_name: iLoveData - Simplified Full Stack Data Engineering
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+      primary: black
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+      primary: black
+  language: en
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  features:
+    - navigation.tabs
+plugins:
+  - blog:
+      blog_dir: .
+  - search
+  - tags
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/iLoveDataJjia
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/repositories/ilovedatajjia
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/james-jiang-87306b155/
+copyright: Copyright &copy; <script>document.write(new Date().getFullYear())</script> James Jiang
+extra_css:
+  - stylesheets/extra.css

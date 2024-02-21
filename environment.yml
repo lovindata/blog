@@ -1,0 +1,8 @@
+name: blogs
+channels:
+  - defaults
+dependencies:
+  - python
+  - pip
+  - pip:
+      - mkdocs-material
