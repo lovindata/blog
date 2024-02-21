@@ -20,7 +20,7 @@ Let's check out what is each library:
 - http4s: A lightweight, purely functional Scala library for building HTTP servers and clients, designed for high performance and composability.
 - Circe: A popular JSON library for Scala that provides seamless JSON parsing and encoding using a powerful and idiomatic functional approach.
 
-As of now, in the Scala ecosystem, there are no actively maintained, production-ready alternatives to Tapir. However, alternatives to http4s include Play and Akka/Http, with Play being a full-stack web framework. For JSON handling, actively maintained alternatives to Circe include json4s, ZIO-json, and Play JSON.
+As of now, in the Scala ecosystem, there are no actively maintained, production-ready alternatives to Tapir. However, alternatives to http4s include Play and Akka/Pekko Http, with Play being more a full-stack web framework. For JSON handling, actively maintained alternatives to Circe include json4s, ZIO-json, and Play JSON.
 
 ## 🚀 Adventure Begins!
 
