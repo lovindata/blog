@@ -10,7 +10,7 @@ What if I told you there exists in Scala a way to build Rest APIs and generate S
 
 <!-- more -->
 
-![Tech stack](assets/image.png)
+![Tech stack](image.png)
 
 ## 😎 Why Tapir, http4s, Circe?
 
@@ -20,7 +20,20 @@ Let's check out what is each library:
 - http4s: A lightweight, purely functional Scala library for building HTTP servers and clients, designed for high performance and composability.
 - Circe: A popular JSON library for Scala that provides seamless JSON parsing and encoding using a powerful and idiomatic functional approach.
 
-As of now, in the Scala ecosystem, there are no actively maintained, production-ready alternatives to Tapir. However, alternatives to http4s include Play and Akka/Pekko Http, with Play being more a full-stack web framework. For JSON handling, actively maintained alternatives to Circe include json4s, ZIO-json, and Play JSON.
+<figure markdown="span">
+  ![Handling Requests](image-1.png)
+  <figcaption>Handling Requests</figcaption>
+</figure>
+
+As of now, in the Scala ecosystem, there are no actively maintained, production-ready alternatives to Tapir. However, alternatives to http4s include Play and Akka/Pekko Http, with Play being more a full-stack web framework. For JSON handling, alternatives to Circe include json4s, ZIO-json, and Play JSON. According to the [2023 Scala survey](https://scalasurvey2023.virtuslab.com/), it appears that the community is leaning towards the Typelevel ecosystem when it comes to building backend systems. You can also check library comparison websites like [LibHunt](https://scala.libhunt.com/) for further insights.
+
+<figure markdown="span">
+  ![Akka/Pekko ecosystem](image-2.png)
+  ![Typelevel ecosystem](image-3.png)
+  <figcaption>Akka/Pekko ecosystem VS Typelevel ecosystem</figcaption>
+</figure>
+
+Either way, all these alternatives are production-ready and actively maintained. You cannot go wrong with choosing any of them.
 
 ## 🚀 Adventure Begins!
 
@@ -32,6 +45,6 @@ As of now, in the Scala ecosystem, there are no actively maintained, production-
 
 ### ✨ Auto Derivation Magic!
 
-### 🧙‍♂️ Crack ADT Code!
+### 🧙‍♂️ Crack ADTs!
 
 ## 🌟 Happy Endings!
