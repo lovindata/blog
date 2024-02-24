@@ -15,11 +15,13 @@ theme:
   favicon: assets/logo.png
   features:
     - navigation.tabs
+    - content.code.copy
 plugins:
   - blog:
       blog_dir: .
   - search
   - tags
+  - glightbox
 extra:
   generator: false
   social:
@@ -33,5 +35,13 @@ copyright: Copyright &copy; <script>document.write(new Date().getFullYear())</sc
 extra_css:
   - stylesheets/extra.css
 markdown_extensions:
-  - attr_list
+  # Markdown in HTML
   - md_in_html
+  # Code blocks
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
