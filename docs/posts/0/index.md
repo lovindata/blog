@@ -34,7 +34,7 @@ As of now, in the Scala ecosystem, there are no actively maintained, production-
 
 Either way, all these alternatives are production-ready and actively maintained. You cannot go wrong with choosing any of them.
 
-## 🏰 Let's Build Our Backend Castle!
+## 🏰 Our Backend Castle!
 
 Setting up a Scala project is essential, and in our case, we'll do it using IntelliJ. However, you can also opt for VSCode with Metals. If it is your first time setting up a Scala project, you can follow Scala's official tutorial ["Getting Started with Scala in IntelliJ"](https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html). The folder structure should be as follows:
 
@@ -98,7 +98,7 @@ You can run `Main.scala` by clicking on `▷` and selecting `Run 'Main'`. If it 
 
 ### ⚡ Backend Electricity Setup
 
-Let's build our first electric central that will empower the future bridges:
+Let's build our first electric central that will empower the future bridges. A REST API server enables clients to interact with resources over HTTP using standard methods.
 
 <figure markdown="span">
   ![Backend Server Configuration](image-3.png)
@@ -175,7 +175,7 @@ If you visit [http://localhost:8080](http://localhost:8080) and see the message 
 
 ### 🌉 First Bridge Endpoint!
 
-It's now the exciting part because we are gonna connect to the external world with bridges! 🤩
+It's now the exciting part because we are gonna connect to the external world with bridges! 🤩 Endpoints are the specific URLs or routes in a web API that clients use to access and interact with resources or services.
 
 <figure markdown="span">
   ![Backend Endpoint](image-4.png)
@@ -224,7 +224,7 @@ object TextCtrl {
 
 Lastly, connect our new, fresh 🌉 bridge to our electrical central ⚡️—you know, the one we built in the previous part. 🤗
 
-```scala title="BackendServerConf.scala" hl_lines="22 29 30 31 32"
+```scala title="BackendServerConf.scala" hl_lines="22 29-32"
 package com.ilovedatajjia
 package config
 
@@ -269,7 +269,275 @@ If you visit [http://localhost:8080/docs](http://localhost:8080/docs) and end up
 
 ## 🎨 Mastering Circe & Tapir
 
+[JSON](https://en.wikipedia.org/wiki/JSON) is the go-to format when it comes to friendly chats between clients and servers. For example, imagine a frontend [Single Page Application (SPA)](https://en.wikipedia.org/wiki/Single-page_application) running on a user's laptop communicating with a backend [RestAPI](https://en.wikipedia.org/wiki/REST). In this article, let's dive into the joy of decoding JSON data from the outside world into Scala classes, or encoding Scala classes into JSON to share with the world. 🌐✨
+
+<figure markdown="span">
+  ![Handling Requests](image-1.png)
+  <figcaption>Handling Requests</figcaption>
+</figure>
+
 ### ✨ Auto Derivation Magic!
+
+#### Theory
+
+"✨ Auto Derivation Magic!" is the technique used to effortlessly convert JSON to Scala case classes or vice versa, leveraging the **attributes of the case classes as JSON fields**. For instance, consider the following JSON object:
+
+```json hl_lines="2-6"
+{
+  "id": 1,
+  "name": "James",
+  "gender": "male",
+  "age": 26,
+  "job": "software engineer"
+}
+```
+
+The corresponding Scala case class, utilizing auto-derivation, would look like:
+
+```scala hl_lines="4-8"
+import features.guest.GuestMod.GenderEnum.Gender
+
+case class GuestMod(
+    id: Long,
+    name: String,
+    gender: Gender,
+    age: Int,
+    job: String
+)
+
+object GuestMod {
+  object GenderEnum extends Enumeration {
+    type Gender = Value
+    val Male: Value      = Value("male")
+    val Female: Value    = Value("female")
+    val NonBinary: Value = Value("non-binary")
+  }
+}
+```
+
+As you can see, it's all about leveraging **"the case class attributes as JSON fields"**. Importantly, to enable auto-derivation, you'll need to have **an instance object of `io.circe.generic.AutoDerivation` and `sttp.tapir.generic.auto.SchemaDerivation` imported into scope**. But don't worry, we'll delve into this in the practical part.
+
+#### Practice
+
+<figure markdown="span">
+  ![✨ Auto derivation in action!](image-9.png)
+  <figcaption>✨ Auto derivation in action!</figcaption>
+</figure>
+
+First, let's define the classes and methods required:
+
+```scala title="GuestMod.scala"
+package com.ilovedatajjia
+package features.guest
+
+import features.guest.GuestMod.GenderEnum.Gender
+import features.guest.dto.GuestDto
+
+case class GuestMod( // Returned by the endpoints == "Scala -> JSON" (also corresponds to an entity in table)
+    id: Long,
+    name: String,
+    gender: Gender,  // A non Scala simple type that needs to be derived manually! (JSON <-> Scala)
+    age: Int,
+    job: String)
+
+object GuestMod {
+  def buildFromDto(id: Long, dto: GuestDto): GuestMod = GuestMod(id, dto.name, dto.gender, dto.age, dto.job)
+
+  object GenderEnum extends Enumeration {
+    type Gender = Value
+    val Male: Value      = Value("male")
+    val Female: Value    = Value("female")
+    val NonBinary: Value = Value("non-binary")
+  }
+}
+```
+
+```scala title="GuestDto.scala"
+package com.ilovedatajjia
+package features.guest.dto
+
+import features.guest.GuestMod.GenderEnum.Gender
+
+case class GuestDto( // It corresponds to the input of the endpoint (JSON -> Scala)
+    name: String,
+    gender: Gender,
+    age: Int,
+    job: String)
+```
+
+Secondly, the shortest but most crucial step! ⚠️ **By importing this `Serializers` object into scope, it implies that all case classes will be convertible between "JSON ↔ Scala". 🤯**
+
+```scala title="Serializers.scala" hl_lines="11"
+package com.ilovedatajjia
+package features.shared
+
+import features.guest.GuestMod.GenderEnum
+import features.guest.GuestMod.GenderEnum.Gender
+import io.circe._
+import io.circe.generic.AutoDerivation
+import sttp.tapir.Schema
+import sttp.tapir.generic.auto.SchemaDerivation
+
+object Serializers extends AutoDerivation with SchemaDerivation { // HERE! ✨ Auto Derivation Magic!
+  implicit val genderEnc: Encoder[Gender] = Encoder.encodeEnumeration(GenderEnum)
+  implicit val genderDec: Decoder[Gender] = Decoder.decodeEnumeration(GenderEnum)
+  implicit val genderSch: Schema[Gender]  = Schema.derivedEnumerationValue[Gender]
+}
+```
+
+Thirdly, let's address the repository responsible for managing the `GuestMod` table and the associated business logic:
+
+```scala title="GuestRep.scala"
+package com.ilovedatajjia
+package features.guest
+
+import cats.effect._
+import cats.effect.unsafe.implicits._
+import features.guest.dto.GuestDto
+
+object GuestRep { // This layer is not important. It's an in-memory table for the example to work.
+  def insert(dto: GuestDto): IO[GuestMod] = guestsTable.modify { table =>
+    val id    = table.length
+    val guest = GuestMod.buildFromDto(id, dto)
+    (table :+ guest, guest) // (Updated table, Returned class)
+  }
+
+  def list(): IO[Vector[GuestMod]] = guestsTable.get
+
+  private val guestsTable: Ref[IO, Vector[GuestMod]] =
+    Ref[IO].of(Vector.empty[GuestMod]).unsafeRunSync() // A concurrent safe in memory table
+}
+```
+
+```scala title="GuestSvc.scala" hl_lines="10-12"
+package com.ilovedatajjia
+package features.guest
+
+import cats.effect.IO
+import features.guest.dto.GuestDto
+import shared.BackendException.BadRequestException
+
+object GuestSvc {
+  def letEnterAdultGuest(dto: GuestDto): IO[GuestMod] = for {
+    _     <- IO.raiseUnless(dto.age >= 18)(
+               BadRequestException("You are not an adult!") // Exception of "BadRequestException" raised
+             )
+    guest <- GuestRep.insert(dto)
+  } yield guest
+
+  def listGuests(): IO[Vector[GuestMod]] = GuestRep.list()
+}
+```
+
+Fourth, let's define our 🌉 bridges (endpoints) that will allow guests to enter the castle 🏰.
+
+```scala title="GuestCtrl.scala" hl_lines="7 23-25 27 41"
+package com.ilovedatajjia
+package features.guest
+
+import cats.effect.IO
+import cats.implicits._
+import features.guest.dto.GuestDto
+import features.shared.Serializers._ // ✨ Auto Derivation Magic! (Make Scala case classes "JSON ↔ Scala" convertible)
+import org.http4s.HttpRoutes
+import shared.BackendException.BadRequestException
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+
+object GuestCtrl {
+  def endpoints: List[AnyEndpoint] = List(letEnterAdultGuestEpt, listGuestsEpt)
+  def routes: HttpRoutes[IO]       = letEnterAdultGuestRts <+> listGuestsRts
+
+  private val letEnterAdultGuestEpt = endpoint
+    .summary("Let enter adult guest")
+    .post
+    .in("guests")
+    .in(jsonBody[GuestDto])                 // ✨ Auto Derivation Magic applied! (Not just simple type but case class this time)
+    .out(jsonBody[GuestMod])                // ✨ Auto Derivation Magic applied!
+    .errorOut(
+      statusCode(StatusCode.BadRequest)
+        .and(jsonBody[BadRequestException]) // This endpoint can throw errors + ✨ Auto Derivation Magic applied!
+    )
+  private val letEnterAdultGuestRts = Http4sServerInterpreter[IO]().toRoutes(
+    letEnterAdultGuestEpt
+      .serverLogicRecoverErrors( // == recover from "BadRequestException" exceptions raised + Encode as JSON and return them
+        dto => GuestSvc.letEnterAdultGuest(dto)))
+
+  private val listGuestsEpt = endpoint
+    .summary("List guests")
+    .get
+    .in("guests")
+    .out(
+      jsonBody[
+        Vector[
+          GuestMod // /!\ Vector of Scala case class derivable is also derivable == ✨ Auto Derivation Magic applied!
+        ]
+      ]
+    )
+  private val listGuestsRts =
+    Http4sServerInterpreter[IO]().toRoutes(listGuestsEpt.serverLogicSuccess(_ => GuestSvc.listGuests()))
+}
+```
+
+Finally, as done in the previous section, let's "connect the bridges to the electrical central 🌉 ↔ ⚡".
+
+```scala title="BackendServerConf.scala" hl_lines="7 31 33"
+package com.ilovedatajjia
+package config
+
+import cats.effect.IO
+import cats.implicits._
+import com.comcast.ip4s._
+import features.guest.GuestCtrl
+import features.text.TextCtrl
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.implicits._
+import shared.BackendException.ServerInternalErrorException
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
+object BackendServerConf {
+  def start: IO[Unit] = for {
+    port <- IO.fromOption(Port.fromInt(EnvLoaderConf.backendPort))(
+              ServerInternalErrorException(s"Not processable port number ${EnvLoaderConf.backendPort}."))
+    _    <- EmberServerBuilder
+              .default[IO]
+              .withHost(ipv4"0.0.0.0")        // Accept connections from any available network interface
+              .withPort(port)                 // On port 8080
+              .withHttpApp(allRts.orNotFound) // Link all routes to the backend server
+              .build
+              .use(_ => IO.never)
+              .start
+              .void
+  } yield ()
+
+  private val docsEpt = // Merge all endpoints as a fully usable OpenAPI doc
+    SwaggerInterpreter().fromEndpoints[IO](TextCtrl.endpoints ++ GuestCtrl.endpoints, "Backend", "1.0")
+  private val allRts  = // Serve the OpenAPI doc & all the other routes
+    Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+> TextCtrl.routes <+> GuestCtrl.routes
+}
+```
+
+#### Results
+
+After re-running, navigate to [http://localhost:8080/docs](http://localhost:8080/docs) to interact with your new endpoints! 😊
+
+<figure markdown="span">
+  ![New guest success](image-6.png)
+  <figcaption>New guest success</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![New guest failed](image-7.png)
+  <figcaption>New guest failed</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![List guests](image-8.png)
+  <figcaption>List guests</figcaption>
+</figure>
 
 ### 🧙‍♂️ Crack ADTs!
 
