@@ -1,12 +1,12 @@
 ---
-title: Effortlessly Build Scala Rest APIs with Tapir, http4s, and Circe!
+title: "Master Scala Rest APIs in 3 Simple Concepts: Illustrated Guide with Tapir, http4s, and Circe!"
 date: 2024-02-21
 categories:
   - Scala
   - Backend
 ---
 
-What if I told you there exists in Scala a way to build Rest APIs and generate SwaggerUI docs simultaneously? Moreover, it's as fast as using FastAPI (for those familiar with Python), while retaining the strong type safety and functional programming style of Scala! 😲 In this post, we'll explore this exciting tech stack: Tapir, http4s, and Circe!
+What if I told you there's a game-changing Scala solution for building Rest APIs and generating SwaggerUI docs at lightning speed? Plus, it's as fast as FastAPI (for Python enthusiasts) to develop! All this while preserving the robust type safety and functional programming elegance of Scala! 😲 In this post, we'll dive deep into this exhilarating tech stack: Tapir, http4s, and Circe!
 
 <!-- more -->
 
@@ -367,7 +367,7 @@ case class GuestDto( // It corresponds to the input of the endpoint (JSON -> Sca
 
 Secondly, the shortest but most crucial step! ⚠️ **By importing this `Serializers` object into scope, it implies that all case classes will be convertible between "JSON ↔ Scala". 🤯**
 
-```scala title="Serializers.scala" hl_lines="11"
+```scala title="Serializers.scala" hl_lines="7 9 11"
 package com.ilovedatajjia
 package features.shared
 
@@ -379,6 +379,7 @@ import sttp.tapir.Schema
 import sttp.tapir.generic.auto.SchemaDerivation
 
 object Serializers extends AutoDerivation with SchemaDerivation { // HERE! ✨ Auto Derivation Magic!
+  // Enumeration needs to be auto derived manually with theses 3 lines 👇 (It will use enumeration actual values when (en/de)coding)
   implicit val genderEnc: Encoder[Gender] = Encoder.encodeEnumeration(GenderEnum)
   implicit val genderDec: Decoder[Gender] = Decoder.decodeEnumeration(GenderEnum)
   implicit val genderSch: Schema[Gender]  = Schema.derivedEnumerationValue[Gender]
@@ -429,7 +430,7 @@ object GuestSvc {
 }
 ```
 
-Fourth, let's define our 🌉 bridges (endpoints) that will allow guests to enter the castle 🏰.
+Fourth, let's define our 🌉 bridges (endpoints) that will allow guests to enter the castle 🏰 and monitor their activities ("see ya, personal privacy" 👀😈).
 
 ```scala title="GuestCtrl.scala" hl_lines="7 23-25 27 41"
 package com.ilovedatajjia
@@ -438,7 +439,7 @@ package features.guest
 import cats.effect.IO
 import cats.implicits._
 import features.guest.dto.GuestDto
-import features.shared.Serializers._ // ✨ Auto Derivation Magic! (Make Scala case classes "JSON ↔ Scala" convertible)
+import features.shared.Serializers._ // ✨ Auto Derivation Magic imported in scope! (== Make Scala case classes "JSON ↔ Scala" convertible)
 import org.http4s.HttpRoutes
 import shared.BackendException.BadRequestException
 import sttp.model.StatusCode
@@ -541,4 +542,273 @@ After re-running, navigate to [http://localhost:8080/docs](http://localhost:8080
 
 ### 🧙‍♂️ Crack ADTs!
 
+#### Theory
+
+[Algebraic Data Types (ADTs)](https://en.wikipedia.org/wiki/Algebraic_data_type) are a way of defining data structures by combining simpler types through two main constructs: Sum Types, representing a choice between alternatives, and Product Types, representing a combination of different types.
+
+Blablabla 🤪, remember that it's commonly just a sealed trait, like this for example (refer to comments if you want to understand in detail):
+
+```scala
+sealed trait Pet // It's an ADT because "Product types" and "Sum types"
+object Pet {
+  case class Dog(name: String,
+                  age: Int) // 👈 "Product types" because "(String, Int)" == More complex type by combining types
+      extends Pet // "Sum types" because "Dog != Cat != Fish != Bird but Dog + Cat + Fish + Bird = Pet" == Distinct types when united define the type
+  case class Cat(name: String, age: Int)  extends Pet
+  case class Fish(name: String, age: Int) extends Pet
+  case class Bird(name: String, age: Int) extends Pet
+}
+```
+
+Now, what if I tell you there's a way to apply the "✨ Auto Derivation Magic!" to sealed traits using a discriminator field? 🤯 For example, these two can be encoded or decoded from one to another:
+
+```json hl_lines="3 8 13"
+[
+  {
+    "type": "Dog", // ⚠️ Discriminator field
+    "name": "Max",
+    "age": 3
+  },
+  {
+    "type": "Fish", // ⚠️ Discriminator field
+    "name": "Poissy (← RER A 🤪, don't worry if you don't understand, Parisians will! XDD)",
+    "age": 2
+  },
+  {
+    "type": "Dog", // ⚠️ Discriminator field
+    "name": "Doggy",
+    "age": 1
+  }
+]
+```
+
+```scala
+val pets: Vector[Pet] = Vector(
+  Dog(name = "Max", age = 3),
+  Fish(name = "Poissy (← RER A \uD83E\uDD2A, don't worry if you don't understand, Parisians will! XDD)", age = 2),
+  Dog(name = "Doggy", age = 1)
+)
+```
+
+For this to work, only two things needed:
+
+- **An instance object of `io.circe.generic.extras.AutoDerivation` and `sttp.tapir.generic.auto.SchemaDerivation` imported into scope** (⚠️ switch `io.circe.generic.AutoDerivation` to `io.circe.generic.extras.AutoDerivation`)
+- Additionally, **two implicit variables of `io.circe.generic.extras.Configuration` and `sttp.tapir.generic.Configuration` imported into scope** (for the discriminator field)
+
+Bear with me 🙏, you will understand in the practice part 👍!
+
+!!! note
+
+    By default, I recommend always opting for the ADT configuration mentioned above. This is because the ADT configuration supports both standalone case classes and case classes with sealed traits, covering our previous use case seamlessly and providing support for ADTs for free.
+
+#### Practice
+
+<figure markdown="span">
+  ![ADT decoded and encoded (Pet contest)](image-10.png)
+  <figcaption>ADT decoded and encoded (Pet contest)</figcaption>
+</figure>
+
+First, let's define the sealed trait and the necessary business logic:
+
+```scala title="PetDto.scala"
+package com.ilovedatajjia
+package features.pet.dto
+
+sealed trait PetDto // An ADT
+
+object PetDto {
+  case class Dog(name: String, age: Int)  extends PetDto
+  case class Cat(name: String, age: Int)  extends PetDto
+  case class Fish(name: String, age: Int) extends PetDto
+  case class Bird(name: String, age: Int) extends PetDto
+}
+```
+
+```scala title="PetSvc.scala"
+package com.ilovedatajjia
+package features.pet
+
+import cats.effect.IO
+import features.pet.dto.PetDto
+import features.pet.dto.PetDto.Dog
+import shared.BackendException.BadRequestException
+
+object PetSvc {
+  def petContest(dto: Vector[PetDto]): IO[PetDto] = for {
+    _      <- IO.raiseUnless(dto.nonEmpty)(BadRequestException("Where are the pets ?! 😡"))
+    pets    = dto.sortWith {
+                case (pet0: Dog, pet1: Dog) => pet0.age < pet1.age // Sort before the younger dog
+                case (_: Dog, _)            => true                // Sort before the dog
+                case _                      => false
+              }
+    bestPet = pets.head
+  } yield bestPet
+}
+```
+
+Secondly, the most crucial part, but just 3 lines of code! 🤣 **The switch import and the two additional implicits**.
+
+```scala title="Serializers.scala" hl_lines="7 15-16"
+package com.ilovedatajjia
+package features.shared
+
+import features.guest.GuestMod.GenderEnum
+import features.guest.GuestMod.GenderEnum.Gender
+import io.circe._
+import io.circe.generic.extras.AutoDerivation // ⚠️ Switched!
+import io.circe.generic.extras.Configuration
+import sttp.tapir.Schema
+import sttp.tapir.generic.{Configuration => TapirConfiguration}
+import sttp.tapir.generic.auto.SchemaDerivation
+
+object Serializers extends AutoDerivation with SchemaDerivation { // HERE! ✨ Auto Derivation Magic!
+  // The 2 implicits 👇
+  implicit val encDecConf: Configuration   = Configuration.default.withDiscriminator("type")
+  implicit val schConf: TapirConfiguration = TapirConfiguration.default.withDiscriminator("type")
+
+  // Enumeration needs to be auto derived manually with theses 3 lines 👇 (It will use enumeration actual values when (en/de)coding)
+  implicit val genderEnc: Encoder[Gender] = Encoder.encodeEnumeration(GenderEnum)
+  implicit val genderDec: Decoder[Gender] = Decoder.decodeEnumeration(GenderEnum)
+  implicit val genderSch: Schema[Gender]  = Schema.derivedEnumerationValue[Gender]
+}
+```
+
+Thirdly, let's define our endpoint.
+
+```scala title="PetCtrl.scala" hl_lines="6 22-23"
+package com.ilovedatajjia
+package features.pet
+
+import cats.effect.IO
+import features.pet.dto.PetDto
+import features.shared.Serializers._ // ✨ Auto Derivation Magic + 2 implicits imported in scope! (== Make Scala sealed traits "JSON ↔ Scala" convertible)
+import org.http4s.HttpRoutes
+import shared.BackendException.BadRequestException
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+
+object PetCtrl {
+  def endpoints: List[AnyEndpoint] = List(petContestEpt)
+  def routes: HttpRoutes[IO]       = petContestRts
+
+  private val petContestEpt = endpoint
+    .summary("Pet contest")
+    .post
+    .in("pets" / "contest")
+    .in(jsonBody[Vector[PetDto]])                                                   // ✨ Auto Derivation Magic applied! (A sealed trait this time :O)
+    .out(jsonBody[PetDto])                                                          // ✨ Auto Derivation Magic applied!
+    .errorOut(statusCode(StatusCode.BadRequest).and(jsonBody[BadRequestException])) // ✨ Auto Derivation Magic applied!
+  private val petContestRts =
+    Http4sServerInterpreter[IO]().toRoutes(petContestEpt.serverLogicRecoverErrors(dto => PetSvc.petContest(dto)))
+}
+```
+
+Finally, you know the tune now, "🌉 ↔ ⚡".
+
+```scala title="BackendServerConf.scala" hl_lines="33 35"
+package com.ilovedatajjia
+package config
+
+import cats.effect.IO
+import cats.implicits._
+import com.comcast.ip4s._
+import features.guest.GuestCtrl
+import features.pet.PetCtrl
+import features.text.TextCtrl
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.implicits._
+import shared.BackendException.ServerInternalErrorException
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
+object BackendServerConf {
+  def start: IO[Unit] = for {
+    port <- IO.fromOption(Port.fromInt(EnvLoaderConf.backendPort))(
+              ServerInternalErrorException(s"Not processable port number ${EnvLoaderConf.backendPort}."))
+    _    <- EmberServerBuilder
+              .default[IO]
+              .withHost(ipv4"0.0.0.0")        // Accept connections from any available network interface
+              .withPort(port)                 // On port 8080
+              .withHttpApp(allRts.orNotFound) // Link all routes to the backend server
+              .build
+              .use(_ => IO.never)
+              .start
+              .void
+  } yield ()
+
+  private val docsEpt = // Merge all endpoints as a fully usable OpenAPI doc
+    SwaggerInterpreter()
+      .fromEndpoints[IO](TextCtrl.endpoints ++ GuestCtrl.endpoints ++ PetCtrl.endpoints, "Backend", "1.0")
+  private val allRts  = // Serve the OpenAPI doc & all the other routes
+    Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+> TextCtrl.routes <+> GuestCtrl.routes <+> PetCtrl.routes
+}
+```
+
+#### Result
+
+<figure markdown="span">
+  ![Pet contest](image-11.png)
+  <figcaption>Pet contest</figcaption>
+</figure>
+
 ## 🌟 Happy Endings!
+
+If you've made it this far, you should now be able to handle 80% of overall backend requirements 💪, specifically "friendly chat between clients and servers using JSON". I'm counting on you 🙏, and remember 🥺, there are only three concepts to keep in mind:
+
+- ⚡ **Backend server**
+
+```scala
+import com.comcast.ip4s._
+import org.http4s.ember.server.EmberServerBuilder
+
+EmberServerBuilder
+  .default[IO]
+  .withHost(ipv4"0.0.0.0")
+  .withPort(myPort)
+  .withHttpApp(allRts.orNotFound)
+  .build
+  .use(_ => IO.never)
+  .start
+  .void
+```
+
+- 🌉 **Endpoint and Route**
+
+```scala
+import sttp.model.StatusCode
+import sttp.tapir._
+import sttp.tapir.json.circe._
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+
+private val myEpt = endpoint
+  .summary("My endpoint summary")
+  .post
+  .in("my-endpoint-path")
+  .in(jsonBody[???])
+  .out(jsonBody[???])
+  .errorOut(statusCode(StatusCode.???).and(jsonBody[???]))
+private val myRts =
+  Http4sServerInterpreter[IO]().toRoutes(myEpt.serverLogicRecoverErrors(inputs => ???))
+```
+
+- ✨ **Auto Derivation Magic!**
+
+```scala
+import io.circe._
+import io.circe.generic.extras.AutoDerivation
+import io.circe.generic.extras.Configuration
+import sttp.tapir.Schema
+import sttp.tapir.generic.{Configuration => TapirConfiguration}
+import sttp.tapir.generic.auto.SchemaDerivation
+
+object Serializers extends AutoDerivation with SchemaDerivation {
+  implicit val encDecConf: Configuration   = Configuration.default.withDiscriminator("type")
+  implicit val schConf: TapirConfiguration = TapirConfiguration.default.withDiscriminator("type")
+
+  // ... some other encoders, decoders and schemas that needs to be defined manually (like enums)
+}
+```
+
+The remaining 20% involves setting up security, streaming support, web sockets, server-sent events, and serving static content. You can find more information about these topics on the [Tapir official docs](https://tapir.softwaremill.com/en/latest/). In most cases, these only need to be set up once or may not be necessary. However, if you'd like me to cover them, please let me know! You can reach me on social media by sending a message 🤗!
