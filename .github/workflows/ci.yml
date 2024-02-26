@@ -26,7 +26,11 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: conda info
-      - run: conda list
-      - run: conda config --show
-      - run: mkdocs gh-deploy --force
+      - shell: bash
+        run: conda info
+      - shell: bash
+        run: conda list
+      - shell: bash
+        run: conda config --show
+      - shell: bash
+        run: mkdocs gh-deploy --force
