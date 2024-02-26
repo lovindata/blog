@@ -1,4 +1,4 @@
-name: blogs
+name: blog
 channels:
   - defaults
 dependencies:
