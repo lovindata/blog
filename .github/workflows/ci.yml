@@ -26,4 +26,4 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: /usr/share/miniconda/envs/blog/Scripts/mkdocs.exe gh-deploy --force
+      - run: /usr/share/miniconda/envs/blog/bin/Scripts/mkdocs.exe gh-deploy --force
