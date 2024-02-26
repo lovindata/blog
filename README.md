@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/tailwindlabs/tailwindcss/actions"><img src="https://img.shields.io/github/actions/workflow/status/tailwindlabs/tailwindcss/ci-stable.yml?branch=master" alt="Build Status"></a>
-    <a href="https://github.com/tailwindcss/tailwindcss/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/tailwindcss.svg" alt="License"></a>
+    <a href="https://github.com/iLoveDataJjia/blog/actions"><img src="https://img.shields.io/github/actions/workflow/status/ilovedatajjia/blog/ci.yml?branch=main" alt="Build Status"></a>
+    <a href="https://github.com/iLoveDataJjia/blog/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ilovedatajjia/blog" alt="License"></a>
 </p>
 
 ---

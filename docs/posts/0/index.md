@@ -34,6 +34,8 @@ As of now, in the Scala ecosystem, there are no actively maintained, production-
 
 Either way, all these alternatives are production-ready and actively maintained. You cannot go wrong with choosing any of them.
 
+For this series, the complete code is available on GitHub 🫡 at [https://github.com/iLoveDataJjia/blog/tree/main/assets/posts/0/backend](https://github.com/iLoveDataJjia/blog/tree/main/assets/posts/0/backend).
+
 ## 🏰 Our Backend Castle!
 
 Setting up a Scala project is essential, and in our case, we'll do it using IntelliJ. However, you can also opt for VSCode with Metals. If it is your first time setting up a Scala project, you can follow Scala's official tutorial ["Getting Started with Scala in IntelliJ"](https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html). The folder structure should be as follows:
@@ -746,7 +748,7 @@ object BackendServerConf {
 }
 ```
 
-#### Result
+#### Results
 
 <figure markdown="span">
   ![Pet contest](image-11.png)
