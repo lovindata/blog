@@ -8,6 +8,9 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
       - uses: actions/checkout@v4
       - name: Configure Git Credentials
@@ -26,11 +29,7 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - shell: bash
-        run: conda info
-      - shell: bash
-        run: conda list
-      - shell: bash
-        run: conda config --show
-      - shell: bash
-        run: mkdocs gh-deploy --force
+      - run: conda info
+      - run: conda list
+      - run: conda config --show
+      - run: mkdocs gh-deploy --force
