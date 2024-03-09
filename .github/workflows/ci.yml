@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - refactor/poetry-setup-small-fixes
 permissions:
   contents: write
 jobs:
@@ -22,6 +23,7 @@ jobs:
           activate-environment: blog
           environment-file: environment.yml
           auto-activate-base: false
+      - run: poetry install
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
       - uses: actions/cache@v4
         with:
