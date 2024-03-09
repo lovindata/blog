@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "blog"
 version = "0.1.0"
-description = "iLoveData - Simplified Full Stack Data Engineering"
-authors = ["iLoveDataJjia <ilovedata.jjia@gmail.com>"]
+description = "LovinData - Simplified Full Stack Data Engineering"
+authors = ["LovinData <ilovedata.jjia@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 

@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 
 import cats.effect._
 import config.BackendServerConf

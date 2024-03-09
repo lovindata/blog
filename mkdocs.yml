@@ -1,4 +1,4 @@
-site_name: iLoveData - Simplified Full Stack Data Engineering
+site_name: LovinData - Simplified Full Stack Data Engineering
 theme:
   name: material
   palette:
@@ -27,11 +27,19 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/iLoveDataJjia
+      link: https://github.com/lovindata
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/user/jamesjg/
     - icon: fontawesome/brands/docker
-      link: https://hub.docker.com/repositories/ilovedatajjia
+      link: https://hub.docker.com/repositories/lovindata
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/jamesjg_
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/james-jiang-87306b155/
+    - icon: fontawesome/brands/reddit
+      link: https://www.reddit.com/user/lovindata/
+    - icon: fontawesome/brands/medium
+      link: https://medium.com/@jamesjg
 copyright: Copyright &copy; <script>document.write(new Date().getFullYear())</script> James Jiang
 extra_css:
   - stylesheets/extra.css

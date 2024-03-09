@@ -1,16 +1,16 @@
 <p align="center">
-  <a href="https://ilovedatajjia.github.io/blog/" target="_blank">
-      <img alt="iLoveData" src="docs/assets/logo.png" width="150" style="max-width: 100%;">
+  <a href="https://lovindata.github.io/blog/" target="_blank">
+      <img alt="LovinData" src="docs/assets/logo.png" width="150" style="max-width: 100%;">
   </a>
 </p>
 
 <p align="center">
-  iLoveData - Simplified Full Stack Data Engineering
+  LovinData - Simplified Full Stack Data Engineering
 </p>
 
 <p align="center">
-    <a href="https://github.com/iLoveDataJjia/blog/actions"><img src="https://img.shields.io/github/actions/workflow/status/ilovedatajjia/blog/ci.yml?branch=main" alt="Build Status"></a>
-    <a href="https://github.com/iLoveDataJjia/blog/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ilovedatajjia/blog" alt="License"></a>
+    <a href="https://github.com/lovindata/blog/actions"><img src="https://img.shields.io/github/actions/workflow/status/lovindata/blog/ci.yml?branch=main" alt="Build Status"></a>
+    <a href="https://github.com/lovindata/blog/blob/main/LICENSE"><img src="https://img.shields.io/github/license/lovindata/blog" alt="License"></a>
 </p>
 
 ---

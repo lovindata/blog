@@ -34,7 +34,7 @@ As of now, in the Scala ecosystem, there are no actively maintained, production-
 
 Either way, all these alternatives are production-ready and actively maintained. You cannot go wrong with choosing any of them.
 
-For this series, the complete code is available on GitHub 🫡 at [https://github.com/iLoveDataJjia/blog/tree/main/assets/posts/0/backend](https://github.com/iLoveDataJjia/blog/tree/main/assets/posts/0/backend).
+For this series, the complete code is available on GitHub 🫡 at [https://github.com/lovindata/blog/tree/main/assets/posts/0/backend](https://github.com/lovindata/blog/tree/main/assets/posts/0/backend).
 
 ## 🏰 Our Backend Castle!
 
@@ -61,7 +61,7 @@ In your `build.sbt`, please add the following dependencies:
  */
 ThisBuild / scalaVersion := "2.13.12" // https://www.scala-lang.org/download/all.html
 lazy val root = (project in file("."))
-  .settings(name := "backend", idePackagePrefix := Some("com.ilovedatajjia"), Defaults.itSettings)
+  .settings(name := "backend", idePackagePrefix := Some("com.lovindata"), Defaults.itSettings)
   .configs(IntegrationTest)
 
 /**
@@ -118,7 +118,7 @@ Let's build our first electric central that will empower the future bridges. A R
 First setup our service which loads environment variables and our backend exceptions:
 
 ```scala title="EnvLoaderConf.scala"
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 object EnvLoaderConf {
@@ -129,7 +129,7 @@ object EnvLoaderConf {
 ```
 
 ```scala title="BackendException.scala"
-package com.ilovedatajjia
+package com.lovindata
 package shared
 
 sealed trait BackendException extends Exception
@@ -143,7 +143,7 @@ object BackendException {
 Second setup our backend server:
 
 ```scala title="BackendServerConf.scala"
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 import cats.effect.IO
@@ -171,7 +171,7 @@ object BackendServerConf {
 Let's finally build the switch to turn on the electricity! 💡
 
 ```scala title="Main.scala"
-package com.ilovedatajjia
+package com.lovindata
 
 import cats.effect._
 import config.BackendServerConf
@@ -195,7 +195,7 @@ It's now the exciting part because we are gonna connect to the external world wi
 First, implement the business logic, which in our case involves counting the number of characters from a text.
 
 ```scala title="TextSvc.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.text
 
 import cats.effect.IO
@@ -209,7 +209,7 @@ object TextSvc {
 Second, build the bridge! 🌉⚒️
 
 ```scala title="TextCtrl.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.text
 
 import cats.effect.IO
@@ -235,7 +235,7 @@ object TextCtrl {
 Lastly, connect our new, fresh 🌉 bridge to our electrical central ⚡️—you know, the one we built in the previous part. 🤗
 
 ```scala title="BackendServerConf.scala" hl_lines="22 29-32"
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 import cats.effect.IO
@@ -337,7 +337,7 @@ As you can see, it's all about leveraging **"the case class attributes as JSON f
 First, let's define the classes and methods required:
 
 ```scala title="GuestMod.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.guest
 
 import features.guest.GuestMod.GenderEnum.Gender
@@ -363,7 +363,7 @@ object GuestMod {
 ```
 
 ```scala title="GuestDto.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.guest.dto
 
 import features.guest.GuestMod.GenderEnum.Gender
@@ -378,7 +378,7 @@ case class GuestDto( // It corresponds to the input of the endpoint (JSON -> Sca
 Secondly, the shortest but most crucial step! ⚠️ **By importing this `Serializers` object into scope, it implies that all case classes will be convertible between "JSON ↔ Scala". 🤯**
 
 ```scala title="Serializers.scala" hl_lines="7 9 11"
-package com.ilovedatajjia
+package com.lovindata
 package features.shared
 
 import features.guest.GuestMod.GenderEnum
@@ -399,7 +399,7 @@ object Serializers extends AutoDerivation with SchemaDerivation { // HERE! ✨ A
 Thirdly, let's address the repository responsible for managing the `GuestMod` table and the associated business logic:
 
 ```scala title="GuestRep.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.guest
 
 import cats.effect._
@@ -421,7 +421,7 @@ object GuestRep { // This layer is not important. It's an in-memory table for th
 ```
 
 ```scala title="GuestSvc.scala" hl_lines="10-12"
-package com.ilovedatajjia
+package com.lovindata
 package features.guest
 
 import cats.effect.IO
@@ -443,7 +443,7 @@ object GuestSvc {
 Fourth, let's define our 🌉 bridges (endpoints) that will allow guests to enter the castle 🏰 and monitor their activities ("see ya, personal privacy" 👀😈).
 
 ```scala title="GuestCtrl.scala" hl_lines="7 23-25 27 41"
-package com.ilovedatajjia
+package com.lovindata
 package features.guest
 
 import cats.effect.IO
@@ -495,7 +495,7 @@ object GuestCtrl {
 Finally, as done in the previous section, let's "connect the bridges to the electrical central 🌉 ↔ ⚡".
 
 ```scala title="BackendServerConf.scala" hl_lines="7 31 33"
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 import cats.effect.IO
@@ -621,7 +621,7 @@ Bear with me 🙏, you will understand in the practice part 👍!
 First, let's define the sealed trait and the necessary business logic:
 
 ```scala title="PetDto.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.pet.dto
 
 sealed trait PetDto // An ADT
@@ -635,7 +635,7 @@ object PetDto {
 ```
 
 ```scala title="PetSvc.scala"
-package com.ilovedatajjia
+package com.lovindata
 package features.pet
 
 import cats.effect.IO
@@ -659,7 +659,7 @@ object PetSvc {
 Secondly, the most crucial part, but just 3 lines of code! 🤣 **The switch import and the two additional implicits**.
 
 ```scala title="Serializers.scala" hl_lines="7 15-16"
-package com.ilovedatajjia
+package com.lovindata
 package features.shared
 
 import features.guest.GuestMod.GenderEnum
@@ -686,7 +686,7 @@ object Serializers extends AutoDerivation with SchemaDerivation { // HERE! ✨ A
 Thirdly, let's define our endpoint.
 
 ```scala title="PetCtrl.scala" hl_lines="6 22-23"
-package com.ilovedatajjia
+package com.lovindata
 package features.pet
 
 import cats.effect.IO
@@ -718,7 +718,7 @@ object PetCtrl {
 Finally, you know the tune now, "🌉 ↔ ⚡".
 
 ```scala title="BackendServerConf.scala" hl_lines="33 35"
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 import cats.effect.IO

@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package features.guest.dto
 
 import features.guest.GuestMod.GenderEnum.Gender

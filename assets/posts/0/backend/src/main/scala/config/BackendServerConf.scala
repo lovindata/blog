@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package config
 
 import cats.effect.IO
