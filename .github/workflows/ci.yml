@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - refactor/poetry-setup-small-fixes
 permissions:
   contents: write
 jobs:
