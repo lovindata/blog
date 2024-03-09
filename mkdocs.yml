@@ -40,6 +40,9 @@ extra:
       link: https://www.reddit.com/user/lovindata/
     - icon: fontawesome/brands/medium
       link: https://medium.com/@jamesjg
+  analytics:
+    provider: google
+    property: G-ZZ86YMNTY8
 copyright: Copyright &copy; <script>document.write(new Date().getFullYear())</script> James Jiang
 extra_css:
   - stylesheets/extra.css
