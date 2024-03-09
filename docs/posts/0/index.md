@@ -55,7 +55,15 @@ backend/
 
 In your `build.sbt`, please add the following dependencies:
 
-```scala
+```scala title="build.sbt" hl_lines="12-18 20-26 28-36 38-46"
+/**
+ * Project configurations.
+ */
+ThisBuild / scalaVersion := "2.13.12" // https://www.scala-lang.org/download/all.html
+lazy val root = (project in file("."))
+  .settings(name := "backend", idePackagePrefix := Some("com.ilovedatajjia"), Defaults.itSettings)
+  .configs(IntegrationTest)
+
 /**
  * Dev dependencies.
  */

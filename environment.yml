@@ -2,8 +2,6 @@ name: blog
 channels:
   - defaults
 dependencies:
-  - python
   - pip
   - pip:
-      - mkdocs-material
-      - mkdocs-glightbox
+      - poetry
