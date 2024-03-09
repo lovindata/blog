@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package constants
 
 sealed trait Pet // It's an ADT because "Product types" and "Sum types"

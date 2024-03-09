@@ -3,7 +3,7 @@
  */
 ThisBuild / scalaVersion := "2.13.12" // https://www.scala-lang.org/download/all.html
 lazy val root = (project in file("."))
-  .settings(name := "backend", idePackagePrefix := Some("com.ilovedatajjia"), Defaults.itSettings)
+  .settings(name := "backend", idePackagePrefix := Some("com.lovindata"), Defaults.itSettings)
   .configs(IntegrationTest)
 
 /**

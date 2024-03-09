@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package features.pet
 
 import cats.effect.IO

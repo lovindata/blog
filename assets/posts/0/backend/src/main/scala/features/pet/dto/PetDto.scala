@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package features.pet.dto
 
 sealed trait PetDto // An ADT

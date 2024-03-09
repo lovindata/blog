@@ -1,4 +1,4 @@
-package com.ilovedatajjia
+package com.lovindata
 package shared
 
 sealed trait BackendException extends Exception
