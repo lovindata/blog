@@ -1,0 +1,7 @@
+name: lost_at_sea_with_react_alembic_fastapi_tailwind_sqlalchemy_a_guide_to_rafts_navigation
+channels:
+  - defaults
+dependencies:
+  - pip
+  - pip:
+      - poetry

@@ -10,5 +10,6 @@
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.autoSearchPaths": false,
+  "python.analysis.extraPaths": ["./backend"],
   "python.analysis.diagnosticMode": "workspace"
 }
