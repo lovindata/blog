@@ -16,7 +16,7 @@ As a Python aficionado, I sought to leverage my programming acumen to enhance ch
 
 Image super resolution and bicubic interpolation differ in their methods for improving image quality. Bicubic interpolation is a simple algorithm that adjusts pixel values to resize images, often leading to blurry outcomes when enlarging. Conversely, image super resolution, powered by deep learning models like CNNs, aims to create high-resolution images with enhanced details by learning from high-quality data.
 
-DAT stands as one of the foremost image super-resolution algorithms. Presently, accessible and user-friendly open-source alternatives encompass:
+**DAT** stands as one of the foremost image super-resolution algorithms. Presently, accessible and user-friendly open-source alternatives encompass:
 
 - **OpenCV's** models (**EDSR, ESPCN, FSRCNN, LapSRN**) from [`opencv-python-headless-contrib`](https://pypi.org/project/opencv-contrib-python-headless/) library
 - **ESRGAN** from [github.com/xinntao/ESRGAN](https://github.com/xinntao/ESRGAN)
@@ -81,7 +81,7 @@ lumine_image.show()
 
 Please note that model weights in `*.pth` format are accessible via a Google Drive link provided on [GitHub](https://github.com/lovindata/pillow-dat) or [PyPI](https://pypi.org/project/pillow-dat/).
 
-By default, when you use the `PIL_DAT.Image.upscale` method, it loads the model, performs the upscaling, and clears the model from the RAM for you. For better performance, especially when calling this function multiple times for the same scaling factor, it's recommended to instantiate the **DAT light** model via custom models.
+By default, when you use the `PIL_DAT.Image.upscale` method, it loads the model, performs the upscaling, and clears the model from the RAM for you. For better performance, especially when calling this function multiple times for the same scaling factor, it's recommended to instantiate the **DAT light** model via **custom models**.
 
 ```python
 from PIL.Image import open
@@ -95,5 +95,52 @@ lumine_image.show()
 ```
 
 ## 📊 Benchmarks
+
+**DAT** will be compared to **OpenCV's** top super resolution model, **EDSR**, or a commercial SaaS product, [**Img.Upscaler**](https://imgupscaler.com/).
+
+All benchmark results presented here are reproducible. For detailed implementation, please refer to the following files in the [benchmarks](https://github.com/lovindata/pillow-dat/tree/main/benchmarks) folder.
+
+### Speed
+
+Performance benchmarks have been conducted on a computing system equipped with an **Intel(R) CORE(TM) i7-9750H CPU @ 2.60GHz processor**, accompanied by a **2 × 8 Go at 2667MHz RAM** configuration. Below are the recorded results:
+
+|  _In seconds_  | 320 × 320 | 640 × 640 | 960 × 960 | 1280 × 1280 |
+| :------------: | :-------: | :-------: | :-------: | :---------: |
+| DAT light (x2) |   16.1    |   65.3    |   146.8   |    339.8    |
+| DAT light (x3) |   14.3    |   61.7    |     -     |      -      |
+| DAT light (x4) |   14.0    |   63.0    |     -     |      -      |
+
+The results were compared against the renowned [`OpenCV`](https://opencv.org/) library, utilizing its `EDSR` model known for delivering superior image quality.
+
+| _In seconds_ | 320 × 320 | 640 × 640 | 960 × 960 | 1280 × 1280 |
+| :----------: | :-------: | :-------: | :-------: | :---------: |
+|  EDSR (x2)   |   25.6    |   112.9   |   264.1   |    472.8    |
+|  EDSR (x3)   |   24.3    |   112.5   |     -     |      -      |
+|  EDSR (x4)   |   23.6    |   111.2   |     -     |      -      |
+
+_Note:_ Since we don't have control over [**Img.Upscaler's**](https://imgupscaler.com/) hardware specifications, it's challenging to provide accurate speed benchmarks.
+
+### Quality
+
+#### Nature
+
+#### People
+
+#### Objects
+
+#### Animals
+
+#### Abstract
+
+### Alpha-channel-awareness
+
+State-of-the-art super-resolution models typically only support RGB images, and this holds true for the original **DAT** models as well. The reason behind this is that datasets used for comparing models in research predominantly consist of RGB images. As a user, this can pose a challenge. However, [`pillow-dat`](https://github.com/lovindata/pillow-dat) offers a solution with its **built-in post-processing logic, effortlessly handling any alpha channel** for you! 🌟
+
+<figure markdown="span">
+  ![Alpha-channel-awareness](image-2.png)
+  <figcaption>Alpha-channel-awareness</figcaption>
+</figure>
+
+You can manage the alpha channel using **OpenCV's EDSR** by creating your own post-processing logic. In this example, we simply compare the raw usage of each solution.
 
 ## 👑 Acknowledgment to the researcher!
