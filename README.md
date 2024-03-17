@@ -15,8 +15,6 @@
 
 ---
 
-Explore frontend, backend, data engineering, data science, MLOps, and DevOps insights on our blog. 🚀 Dive deep into each topic with clear explanations and illustrations. 🎨 Enhance your skills with our organized posts! 🌟
-
 ## Contribution
 
 Please install [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/index.html).

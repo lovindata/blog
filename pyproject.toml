@@ -1,4 +1,5 @@
 [tool.poetry]
+package-mode = false
 name = "blog"
 version = "0.1.0"
 description = "LovinData - Simplified Full Stack Data Engineering"
