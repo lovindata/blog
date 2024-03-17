@@ -1,12 +1,12 @@
 ---
 title: "Image Super-Resolution: DAT (Dual Aggregation Transformer) the new goat for Pythonistas? 🐍"
-date: 2024-02-21
+date: 2024-03-17
 categories:
   - Python
   - Library
 ---
 
-As a Python aficionado, I sought to leverage my programming acumen to enhance cherished images. Armed with the powerful **Pillow** library, I embarked on this mission, only to be met with disappointment 😑 when the results from the conventional **resize** method yielded subpar quality – a far cry from the vibrant images I envisioned. In this article, I am excited to unveil a groundbreaking solution. Say goodbye to lackluster results and hello to superior image quality! 🫨
+As a Python aficionado, I sought to leverage my programming acumen to enhance cherished images. Armed with the powerful **Pillow** library, I embarked on this mission, only to be met with disappointment 😑 when the results from the conventional `resize` method yielded subpar quality – a far cry from the vibrant images I envisioned. In this article, I am excited to unveil a groundbreaking solution. Say goodbye to lackluster results and hello to superior image quality! 🫨
 
 <!-- more -->
 
@@ -18,7 +18,7 @@ Image super resolution and bicubic interpolation differ in their methods for imp
 
 **DAT** stands as one of the foremost image super-resolution algorithms. Presently, accessible and user-friendly open-source alternatives encompass:
 
-- **OpenCV's** models (**EDSR, ESPCN, FSRCNN, LapSRN**) from [`opencv-python-headless-contrib`](https://pypi.org/project/opencv-contrib-python-headless/) library
+- **OpenCV's** models (**EDSR, ESPCN, FSRCNN, LapSRN**) from [`opencv-contrib-python-headless`](https://pypi.org/project/opencv-contrib-python-headless/) library
 - **ESRGAN** from [github.com/xinntao/ESRGAN](https://github.com/xinntao/ESRGAN)
 
 These options necessitate an initial setup, like downloading weights. For ESRGAN, some code tinkering is needed to make it programmatically usable. Additionally, these alternatives are becoming dated — **EDSR** was released in 2017 and **ESRGAN** in 2018. The field of research in image super resolution has since progressed.
@@ -32,7 +32,7 @@ As machine learning engineers, data scientists, or even Python developers, we al
 
 ## 🚀 How to use DAT?
 
-### Quickstart: just `upscale`
+### Quickstart: `upscale`
 
 For the installation according to your dependency manager:
 
@@ -96,7 +96,7 @@ lumine_image.show()
 
 ## 📊 Benchmarks
 
-**DAT** will be compared to **OpenCV's** top super resolution model, **EDSR**, or a commercial SaaS product, [**Img.Upscaler**](https://imgupscaler.com/).
+**DAT** will be compared to **OpenCV's** top super resolution model, **EDSR**, and a commercial SaaS product, [**Img.Upscaler**](https://imgupscaler.com/).
 
 All benchmark results presented here are reproducible. For detailed implementation, please refer to the following files in the [benchmarks](https://github.com/lovindata/pillow-dat/tree/main/benchmarks) folder.
 
@@ -122,15 +122,15 @@ _Note:_ Since we don't have control over [**Img.Upscaler's**](https://imgupscale
 
 ### Quality
 
-#### Nature
+- Nature
 
-#### People
+- People
 
-#### Objects
+- Object
 
-#### Animals
+- Animal
 
-#### Abstract
+- Abstract
 
 ### Alpha-channel-awareness
 
@@ -141,6 +141,19 @@ State-of-the-art super-resolution models typically only support RGB images, and 
   <figcaption>Alpha-channel-awareness</figcaption>
 </figure>
 
-You can manage the alpha channel using **OpenCV's EDSR** by creating your own post-processing logic. In this example, we simply compare the raw usage of each solution.
+In this example, we're just comparing the basic usage of each solution. While it's possible to manage the alpha channel manually for the **OpenCV's EDSR** case, it would require additional effort.
 
-## 👑 Acknowledgment to the researcher!
+## 👑 Conclusion
+
+This library is founded upon the pioneering research paper, ["Dual Aggregation Transformer for Image Super-Resolution"](https://openaccess.thecvf.com/content/ICCV2023/papers/Chen_Dual_Aggregation_Transformer_for_Image_Super-Resolution_ICCV_2023_paper.pdf).
+
+```
+@inproceedings{chen2023dual,
+    title={Dual Aggregation Transformer for Image Super-Resolution},
+    author={Chen, Zheng and Zhang, Yulun and Gu, Jinjin and Kong, Linghe and Yang, Xiaokang and Yu, Fisher},
+    booktitle={ICCV},
+    year={2023}
+}
+```
+
+It is important to emphasize that it has no intention to plagiarize or steal the work of the authors. We extend our sincere appreciation to the researchers for their groundbreaking contributions, which have inspired the development of this library. Thank you for your dedication to advancing the field of image super-resolution. 🙏

@@ -1,0 +1,17 @@
+[tool.poetry]
+package-mode = false
+name = "scripts"
+version = "0.1.0"
+description = ""
+authors = ["LovinData <ilovedata.jjia@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pillow-dat = "^0.1.11"
+opencv-contrib-python-headless = "^4.9.0.80"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
