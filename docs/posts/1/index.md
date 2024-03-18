@@ -125,6 +125,8 @@ _Note:_ Since we don't have control over [**Img.Upscaler's**](https://imgupscale
 
 ### Quality
 
+Let's delineate five key themes encompassing all image types: **Abstract, Animal, Nature, Object, and People**. Subsequently, we will employ each solution to upscale images under each respective theme.
+
 <figure markdown="span">
   ![Abstract](image-3.png)
   <figcaption>Abstract</figcaption>
@@ -149,6 +151,8 @@ _Note:_ Since we don't have control over [**Img.Upscaler's**](https://imgupscale
   ![People](image-7.png)
   <figcaption>People</figcaption>
 </figure>
+
+While informative, these tests may not encompass every scenario for each solution. Your images may vary, impacting results. For the most reliable assessment, try each solution yourself to form your own opinion! 😉
 
 ### Alpha-channel-awareness
 
