@@ -66,7 +66,7 @@ The library offers four versions of **DAT** models for advanced programmers. Her
 - **DAT 2** with **11.21M parameters**
 - **DAT** with **14.80M parameters**
 
-By default, the method `PIL_DAT.Image.upscale` utilizes the **DAT light** models. However, if you're feeling adventurous or require even higher image quality, you can access these advanced versions using **custom models**:
+By default, the method `PIL_DAT.Image.upscale` utilizes the embarked **DAT light** models. However, if you're feeling adventurous or require even higher image quality, you can access these advanced versions using **custom models**:
 
 ```python title="example_custom_model.py" hl_lines="6-7"
 from PIL.Image import open
@@ -98,7 +98,10 @@ lumine_image.show()
 
 **DAT** will be compared to **OpenCV's** top super resolution model, **EDSR**, and a commercial SaaS product, [**Img.Upscaler**](https://imgupscaler.com/).
 
-All benchmark results presented here are reproducible. For detailed implementation, please refer to the following files in the [benchmarks](https://github.com/lovindata/pillow-dat/tree/main/benchmarks) folder.
+All benchmark results presented here are reproducible. For detailed implementation, please consult the following resources:
+
+- Located in the [benchmarks](https://github.com/lovindata/pillow-dat/tree/main/benchmarks) folder on the official GitHub repository of [`pillow-dat`](https://github.com/lovindata/pillow-dat).
+- Within the [scripts](https://github.com/lovindata/blog/tree/feature/main/assets/posts/1/scripts) folder that houses our personal source code, used for testing this library.
 
 ### Speed
 
@@ -122,15 +125,30 @@ _Note:_ Since we don't have control over [**Img.Upscaler's**](https://imgupscale
 
 ### Quality
 
-- Nature
+<figure markdown="span">
+  ![Abstract](image-3.png)
+  <figcaption>Abstract</figcaption>
+</figure>
 
-- People
+<figure markdown="span">
+  ![Animal](image-4.png)
+  <figcaption>Animal</figcaption>
+</figure>
 
-- Object
+<figure markdown="span">
+  ![Nature](image-5.png)
+  <figcaption>Nature</figcaption>
+</figure>
 
-- Animal
+<figure markdown="span">
+  ![Object](image-6.png)
+  <figcaption>Object</figcaption>
+</figure>
 
-- Abstract
+<figure markdown="span">
+  ![People](image-7.png)
+  <figcaption>People</figcaption>
+</figure>
 
 ### Alpha-channel-awareness
 
@@ -156,4 +174,4 @@ This library is founded upon the pioneering research paper, ["Dual Aggregation T
 }
 ```
 
-It is important to emphasize that it has no intention to plagiarize or steal the work of the authors. We extend our sincere appreciation to the researchers for their groundbreaking contributions, which have inspired the development of this library. Thank you for your dedication to advancing the field of image super-resolution. 🙏
+We extend our heartfelt appreciation to both the researchers and engineers. The researchers' groundbreaking contributions have inspired the development of this library, pushing forward image super-resolution. Moreover, the engineers' efforts have made the model accessible to basic developers, expanding the reach of this technology. 🙏
