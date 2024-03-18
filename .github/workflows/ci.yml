@@ -65,4 +65,6 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: mkdocs gh-deploy --force
+      - run: |
+          source .venv/bin/activate
+          mkdocs gh-deploy --force
