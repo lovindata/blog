@@ -13,58 +13,55 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      #----------------------------------------------
-      #       check-out repo and set-up python
-      #----------------------------------------------
-      - uses: actions/checkout@v4
+      # Checkout repository & Setup git credentials
+      - name: Check out repository
+        uses: actions/checkout@v4
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      # Setup python
       - name: Set up python
         id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      #----------------------------------------------
-      #  -----  install & configure poetry  -----
-      #----------------------------------------------
+          
+      # Setup poetry
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
-      #----------------------------------------------
-      #       load cached venv if cache exists
-      #----------------------------------------------
+
+      # Load cached venv
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
+          
+      # Load cached dependencies or install
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
-      #----------------------------------------------
-      # install your root project, if required
-      #----------------------------------------------
       - name: Install project
         run: poetry install --no-interaction
-      #----------------------------------------------
-      #              deploy
-      #----------------------------------------------
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+        
+      # Setup cache & Deploy using the venv
+      - name: Prepare cache setup
+        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Setup cache to improve workflow execution time
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: |
+      - name: Deploy
+        run: |
           source .venv/bin/activate
           mkdocs gh-deploy --force
