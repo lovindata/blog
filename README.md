@@ -17,23 +17,28 @@
 
 ## Contribution
 
-Please install [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/index.html).
+Please install [Python](https://www.python.org/downloads/).
 
-To create or update the `blog` Python environment:
+Please install [Poetry](https://python-poetry.org/docs/#installation) via [pipx](https://pipx.pypa.io/stable/installation/).
+
+Please install [VSCode](https://code.visualstudio.com/) and its extensions:
+
+- Even Better TOML
+- Prettier
+
+To have your Python environment inside your project (optional):
 
 ```bash
-conda env create --file environment.yml
+poetry config virtualenvs.in-project true
 ```
 
-```bash
-conda env update --file environment.yml --prune
-```
-
-To install or update dependencies:
+To create your Python environment and install dependencies:
 
 ```bash
 poetry install
 ```
+
+To update dependencies:
 
 ```bash
 poetry update
