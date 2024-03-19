@@ -55,7 +55,7 @@ jobs:
       - name: Prepare cache setup
         run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - name: Setup cache to improve workflow execution time
-      - uses: actions/cache@v4
+        uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
           path: .cache
