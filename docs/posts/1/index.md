@@ -83,7 +83,7 @@ Please note that model weights in `*.pth` format are accessible via a Google Dri
 
 By default, when you use the `PIL_DAT.Image.upscale` method, it loads the model, performs the upscaling, and clears the model from the RAM for you. For better performance, especially when calling this function multiple times for the same scaling factor, it's recommended to instantiate the **DAT light** model via **custom models**.
 
-```python
+```python hl_lines="6-7"
 from PIL.Image import open
 
 from PIL_DAT.dat_light import DATLight
