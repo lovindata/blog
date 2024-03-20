@@ -101,7 +101,7 @@ lumine_image.show()
 All benchmark results presented here are reproducible. For detailed implementation, please consult the following resources:
 
 - Located in the [benchmarks](https://github.com/lovindata/pillow-dat/tree/main/benchmarks) folder on the official GitHub repository of [`pillow-dat`](https://github.com/lovindata/pillow-dat).
-- Within the [scripts](https://github.com/lovindata/blog/tree/feature/main/assets/posts/1/scripts) folder that houses our personal source code, used for testing this library.
+- Within the [scripts](https://github.com/lovindata/blog/tree/main/assets/posts/1/scripts) folder that houses our personal source code, used for testing this library.
 
 ### Speed
 
@@ -150,6 +150,33 @@ Let's delineate five key themes encompassing all image types: **Abstract, Animal
 <figure markdown="span">
   ![People](image-7.png)
   <figcaption>People</figcaption>
+</figure>
+
+While the images may initially seem identical, closer inspection or zooming in reveals subtle quality differences. Let's examine the zoomed images for a clearer view! 🔎
+
+<figure markdown="span">
+  ![Abstract Zoomed](image-8.png)
+  <figcaption>Abstract Zoomed</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Animal Zoomed](image-9.png)
+  <figcaption>Animal Zoomed</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Nature Zoomed](image-10.png)
+  <figcaption>Nature Zoomed</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Object Zoomed](image-11.png)
+  <figcaption>Object Zoomed</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![People Zoomed](image-12.png)
+  <figcaption>People Zoomed</figcaption>
 </figure>
 
 While informative, these tests may not encompass every scenario for each solution. Your images may vary, impacting results. For the most reliable assessment, try each solution yourself to form your own opinion! 😉
