@@ -3,7 +3,6 @@ title: "Image Super-Resolution: DAT (Dual Aggregation Transformer) the new goat 
 date: 2024-03-17
 categories:
   - Python
-  - Library
 ---
 
 As a Python aficionado, I sought to leverage my programming acumen to enhance cherished images. Armed with the powerful **Pillow** library, I embarked on this mission, only to be met with disappointment 😑 when the results from the conventional `resize` method yielded subpar quality – a far cry from the vibrant images I envisioned. In this article, I am excited to unveil a groundbreaking solution. Say goodbye to lackluster results and hello to superior image quality! 🫨
