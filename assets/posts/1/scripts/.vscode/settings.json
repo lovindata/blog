@@ -1,7 +1,10 @@
 {
+  // General
+  "editor.formatOnSave": true,
+
+  // Python
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
     }
@@ -9,6 +12,7 @@
   "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
-  "python.analysis.autoSearchPaths": false,
-  "python.analysis.diagnosticMode": "workspace"
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.ignore": ["**/.venv/**"],
+  "python.analysis.autoSearchPaths": false
 }

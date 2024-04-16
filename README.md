@@ -19,12 +19,17 @@
 
 Please install [Python](https://www.python.org/downloads/).
 
-Please install [Poetry](https://python-poetry.org/docs/#installation) via [pipx](https://pipx.pypa.io/stable/installation/).
+Please install [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) with the official installer.
 
 Please install [VSCode](https://code.visualstudio.com/) and its extensions:
 
 - Even Better TOML
 - Prettier
+
+If you need to switch between Python interpreters:
+
+- `CTRL + SHIFT + P`
+- `Python: Select Interpreter`
 
 To have your Python environment inside your project (optional):
 
@@ -44,8 +49,14 @@ To update dependencies:
 poetry update
 ```
 
+To clear poetry cache:
+
+```bash
+poetry cache clear --all .
+```
+
 To serve the blog, run the command:
 
 ```bash
-mkdocs serve
+poetry run mkdocs serve
 ```

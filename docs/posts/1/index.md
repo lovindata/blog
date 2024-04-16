@@ -204,4 +204,4 @@ This library is founded upon the pioneering research paper, ["Dual Aggregation T
 }
 ```
 
-We extend our heartfelt appreciation to both the researchers and engineers. The researchers' groundbreaking contributions have inspired the development of this library, pushing forward image super-resolution. Moreover, the engineers' efforts have made the model accessible to basic developers, expanding the reach of this technology. 🙏
+We extend our heartfelt appreciation to the researchers. The researchers' groundbreaking contributions have inspired the development of this library, pushing forward image super-resolution. 🙏
