@@ -1,5 +1,5 @@
 ---
-title: "Introducing TARP Stack ⛺ - Tapir, React and PostgreSQL"
+title: "Introducing TARP Stack ⛺ – Tapir, React and PostgreSQL"
 date: 2024-04-18
 categories:
   - TypeScript
@@ -10,17 +10,42 @@ categories:
   - DevOps
 ---
 
+I landed my first job as a Data Engineer using Scala. It's been over 3 years now, approaching 4 years. The more experience you gain, the more you want to spread your wings 🪽 to tackle even bigger and more complex projects than just data pipelines, like developing **full-stack web data applications**. But, I really do not want to dissipate myself too much on all the programming languages, libraries, or frameworks out there 😣. These are just tools. What's important is how efficiently you can use them for the product or feature you envisioned 🦄🌈. Sooo! For me, it's currently the **TARP** tech stack!
+
 <!-- more -->
 
-## 🤔 Why TARP?
+![TARP](image.png)
 
-I got my first job as a Data Engineer using Scala. It's been now more than 3 years, reaching 4 years. The more experience you gain the more you want to spread your wings 🪽 to build even bigger and complex things than just data pipelines.
+## 🤔 What is TARP?
 
-But, I really do not want to dissipate myself too much on all the programming languages out there 😣. Progamming languages are just a mean to an end, what is important is how efficient you are with it for producing the product or feature you in-visioned 🦄🌈. Sooo! For me, currently it's:
+**TARP** stands for **Tapir**, **React** and **PostgreSQL**. In detail:
 
-- 🦛 **Tapir**: For the backend, it's a FastAPI kind of like lightweight library for building endpoint plus giving a free SwaggerUI docs.
-- ⚛️ **React**: For the frontend, the most popular and with the biggest community according.
-- 🐘 **PostgreSQL**: For the database, same because of popularity and community.
+- 🦛 **Tapir**: For the backend, it's a lightweight library similar to FastAPI, designed for building endpoints and providing free SwaggerUI docs.
+- ⚛️ **React**: For the frontend, it's the most popular framework with the largest community, according to the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
+- 🐘 **PostgreSQL**: Chosen for the database due to its popularity and strong community support, as indicated by the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
 
-I'm really excited to show it Let's start building shall we! 😣
-Do you know what a "TARP" is 🤣? A tarp functions as a waterproof protective cover, for example, when building tents ⛺.
+I'm really excited 😄 to demonstrate how productive you can be with this tech stack. Let's start building, shall we! By the way, do you know what "TARP" stands for? 🤣 A tarp functions as a waterproof protective cover, for example, when building tents ⛺.
+
+## 👨‍💻 Development Environment
+
+### Database
+
+### Backend
+
+### Frontend
+
+## 🏗️ Building Your Application
+
+### Database
+
+### Backend
+
+### Frontend
+
+## 🎁 Wrapping Up For Production
+
+### Serving React via Tapir
+
+### Optimized Docker Build
+
+## 🌟 Full-Stack Developer Reached!
