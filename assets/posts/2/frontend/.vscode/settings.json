@@ -31,10 +31,5 @@
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-
-  // Docker
-  "[dockerfile]": {
-    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-  }
+  "typescript.preferences.importModuleSpecifier": "non-relative"
 }

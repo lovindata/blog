@@ -42,7 +42,7 @@
 /.settings
 
 # vscode
-/.vscode
+# /.vscode
 
 # Standard symbolic link to build/quick/bin
 /qbin

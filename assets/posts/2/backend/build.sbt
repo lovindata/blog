@@ -61,4 +61,6 @@ libraryDependencies += "org.tpolecat" %% "doobie-hikari"   % "1.0.0-RC5"
 
 // Flyway
 // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-libraryDependencies += "org.flywaydb" % "flyway-core" % "10.11.1"
+libraryDependencies += "org.flywaydb" % "flyway-core"                % "10.11.1"
+// https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql
+libraryDependencies += "org.flywaydb" % "flyway-database-postgresql" % "10.11.1" % "runtime"

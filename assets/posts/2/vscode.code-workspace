@@ -1,0 +1,33 @@
+{
+  "folders": [
+    {
+      "path": "backend"
+    },
+    {
+      "path": "devops"
+    },
+    {
+      "path": "frontend"
+    },
+    {
+      "path": "../../.."
+    }
+  ],
+  "settings": {
+    "files.watcherExclude": {
+      "**/target": true
+    },
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "tarp",
+        "group": "tarp",
+        "database": "tarp",
+        "username": "tarp"
+      }
+    ]
+  }
+}
