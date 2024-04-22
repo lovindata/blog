@@ -1,5 +1,4 @@
-package com.lovindata
-package conf
+package confs
 
 case class EnvConf() {
   private val allEnvVar: Map[String, String] = sys.env

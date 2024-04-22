@@ -2,9 +2,7 @@
  * Project configurations.
  */
 ThisBuild / scalaVersion := "2.13.13" // https://www.scala-lang.org/download/all.html
-lazy val root = (project in file("."))
-  .settings(name := "backend", idePackagePrefix := Some("com.lovindata"), Defaults.itSettings)
-  .configs(IntegrationTest)
+lazy val root = (project in file(".")).settings(name := "backend")
 
 /**
  * Dev dependencies.
@@ -16,6 +14,8 @@ libraryDependencies += "org.typelevel" %% "cats-effect"        % "3.5.4"
 addCompilerPlugin("com.olegpy"         %% "better-monadic-for" % "0.3.1")
 // https://mvnrepository.com/artifact/dev.optics/monocle-core
 libraryDependencies += "dev.optics"    %% "monocle-core"       % "3.2.0"
+// https://mvnrepository.com/artifact/dev.optics/monocle-macro
+libraryDependencies += "dev.optics"    %% "monocle-macro"      % "3.2.0"
 
 // Tapir
 // https://mvnrepository.com/artifact/com.softwaremill.sttp.tapir/tapir-http4s-server
