@@ -12,6 +12,10 @@ export interface paths {
     /** Add one to counter */
     post: operations["postApiCounterAdd-one"];
   };
+  "/": {
+    /** Frontend served from ../frontend/dist on the file system */
+    get: operations["getRoot"];
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -40,6 +44,57 @@ export interface operations {
         content: {
           "application/json": number;
         };
+      };
+    };
+  };
+  /** Frontend served from ../frontend/dist on the file system */
+  getRoot: {
+    parameters: {
+      header?: {
+        "If-None-Match"?: string;
+        "If-Modified-Since"?: string;
+        Range?: string;
+        "Accept-Encoding"?: string;
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          "Last-Modified"?: string;
+          "Content-Length"?: number;
+          "Content-Type"?: string;
+          ETag?: string;
+          "Accept-Ranges"?: string;
+          "Content-Encoding"?: string;
+        };
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+      206: {
+        headers: {
+          "Last-Modified"?: string;
+          "Content-Length"?: number;
+          "Content-Type"?: string;
+          ETag?: string;
+          "Accept-Ranges"?: string;
+          "Content-Range"?: string;
+        };
+        content: {
+          "application/octet-stream": string;
+        };
+      };
+      304: {
+        content: never;
+      };
+      400: {
+        content: never;
+      };
+      404: {
+        content: never;
+      };
+      416: {
+        content: never;
       };
     };
   };

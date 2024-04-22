@@ -27,7 +27,7 @@ case class DbConf()(implicit envConf: EnvConf) {
   def run[A](sqls: ConnectionIO[A]): IO[A] = transactor.use(sqls.transact[IO])
 
   private val transactor: Resource[IO, HikariTransactor[IO]] = for {
-    ce <- ExecutionContexts.fixedThreadPool[IO](32) // our connect EC
+    ce <- ExecutionContexts.fixedThreadPool[IO](32)
     xa <- HikariTransactor.newHikariTransactor[IO](
             "org.postgresql.Driver",
             s"jdbc:postgresql://${envConf.postgresIp}:${envConf.postgresPort}/${envConf.postgresDb}?currentSchema=${envConf.postgresSchema}",
