@@ -3,15 +3,14 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/counter": {
+  "/api/counter": {
     /** Get counter */
-    get: operations["getCounter"];
+    get: operations["getApiCounter"];
   };
-  "/counter/add-one": {
+  "/api/counter/add-one": {
     /** Add one to counter */
-    post: operations["postCounterAdd-one"];
+    post: operations["postApiCounterAdd-one"];
   };
 }
 
@@ -24,9 +23,8 @@ export type $defs = Record<string, never>;
 export type external = Record<string, never>;
 
 export interface operations {
-
   /** Get counter */
-  getCounter: {
+  getApiCounter: {
     responses: {
       200: {
         content: {
@@ -36,10 +34,12 @@ export interface operations {
     };
   };
   /** Add one to counter */
-  "postCounterAdd-one": {
+  "postApiCounterAdd-one": {
     responses: {
       200: {
-        content: never;
+        content: {
+          "application/json": number;
+        };
       };
     };
   };
