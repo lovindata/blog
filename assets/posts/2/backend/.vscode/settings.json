@@ -19,5 +19,5 @@
   "[scala]": {
     "editor.defaultFormatter": "scalameta.metals"
   },
-  "metals.javaHome": "D:\\Application\\Java\\jdk-17.0.11+9" // Put your JDK path here!
+  "metals.javaHome": "D:\\Application\\Java\\jdk-17.0.11+9\\bin" // Put your JDK "bin" path here!
 }

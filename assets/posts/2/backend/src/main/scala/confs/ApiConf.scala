@@ -26,9 +26,9 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 case class ApiConf()(implicit envConf: EnvConf, counterCtrl: CounterCtrl, logger: Logger[IO] = Slf4jLogger.getLogger) {
   def setup: IO[Unit] = for {
-    port      <- IO.fromOption(Port.fromInt(envConf.backendPort))(
-                   new Throwable(s"Not processable port number ${envConf.backendPort}."))
-    corsPolicy = CORS.policy.withAllowOriginHostCi(_ => envConf.backendDevMode)
+    port      <-
+      IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))
+    corsPolicy = CORS.policy.withAllowOriginHostCi(_ => envConf.devMode)
     _         <- EmberServerBuilder
                    .default[IO]
                    .withHost(ipv4"0.0.0.0")                    // Accept connections from any available network interface
@@ -44,7 +44,7 @@ case class ApiConf()(implicit envConf: EnvConf, counterCtrl: CounterCtrl, logger
     staticFilesGetServerEndpoint[IO](emptyInput)("../frontend/dist",
                                                  FilesOptions.default.defaultFile(List("index.html")))
   private val frontendEpt         =
-    frontendServerLogic.endpoint.summary("Frontend served from ../frontend/dist on the file system")
+    frontendServerLogic.endpoint.summary("Frontend served from '../frontend/dist' on the file system")
   private val frontendRts         = Http4sServerInterpreter[IO]().toRoutes(frontendServerLogic)
 
   private val docsEpt =
@@ -53,7 +53,7 @@ case class ApiConf()(implicit envConf: EnvConf, counterCtrl: CounterCtrl, logger
     val loggerMiddleware = LoggerMiddleware.httpRoutes(
       logHeaders = true,
       logBody = true,
-      redactHeadersWhen = _ => !envConf.backendDevMode,
+      redactHeadersWhen = _ => !envConf.devMode,
       logAction = Some((msg: String) => info"$msg")
     )(_)
     Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+> loggerMiddleware(counterCtrl.routes) <+> frontendRts
