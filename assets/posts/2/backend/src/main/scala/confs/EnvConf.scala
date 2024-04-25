@@ -3,8 +3,10 @@ package confs
 final case class EnvConf() {
   private val allEnvVar: Map[String, String] = sys.env
 
-  val devMode: Boolean = allEnvVar.getOrElse("TARP_DEV_MODE", default = "true") == "true"
-  val port: Int        = allEnvVar.getOrElse("TARP_PORT", default = "8080").toInt
+  val devMode: Boolean =
+    allEnvVar.getOrElse("TARP_DEV_MODE",
+                        default = "true") == "true" // To handle different behaviors in dev and prod environments
+  val port: Int = allEnvVar.getOrElse("TARP_PORT", default = "8080").toInt
 
   val postgresIp: String       = allEnvVar.getOrElse("TARP_POSTGRES_IP", default = "localhost")
   val postgresPort: Int        = allEnvVar.getOrElse("TARP_POSTGRES_PORT", default = "5432").toInt

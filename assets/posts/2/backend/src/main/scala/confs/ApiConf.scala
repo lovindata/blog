@@ -31,11 +31,12 @@ final case class ApiConf()(implicit
   def setup: IO[Unit] = for {
     port      <-
       IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))
-    corsPolicy = CORS.policy.withAllowOriginHostCi(_ => envConf.devMode)
+    corsPolicy = CORS.policy.withAllowOriginHostCi(_ =>
+                   envConf.devMode) // Essential for local development setup with an SPA running on a separate port
     _         <- EmberServerBuilder
                    .default[IO]
                    .withHost(ipv4"0.0.0.0")                    // Accept connections from any available network interface
-                   .withPort(port)                             // On port 8080
+                   .withPort(port)                             // On a given port
                    .withHttpApp(corsPolicy(allRts).orNotFound) // Link all routes to the backend server
                    .build
                    .use(_ => IO.never)
@@ -53,12 +54,13 @@ final case class ApiConf()(implicit
   private val docsEpt =
     SwaggerInterpreter().fromEndpoints[IO](counterCtrl.endpoints :+ frontendEpt, "Backend – TARP Stack ⛺", "1.0")
   private val allRts  = {
-    val loggerMiddleware = LoggerMiddleware.httpRoutes(
-      logHeaders = true,
-      logBody = true,
-      redactHeadersWhen = _ => !envConf.devMode,
-      logAction = Some((msg: String) => info"$msg")
-    )(_)
+    val loggerMiddleware =
+      LoggerMiddleware.httpRoutes(                 // To log incoming requests or outgoing responses from the server
+        logHeaders = true,
+        logBody = true,
+        redactHeadersWhen = _ => !envConf.devMode, // Display header values exclusively during development mode
+        logAction = Some((msg: String) => info"$msg")
+      )(_)
     Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+> loggerMiddleware(counterCtrl.routes) <+> frontendRts
   }
 }

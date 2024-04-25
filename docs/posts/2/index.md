@@ -20,9 +20,9 @@ I landed my first job as a Data Engineer using Scala. It's been over 3 years now
 
 **TARP** stands for **Tapir**, **React** and **PostgreSQL**. In detail:
 
-- 🦛 **Tapir**: For the backend, it's a lightweight library similar to FastAPI, designed for building endpoints and providing free SwaggerUI docs.
-- ⚛️ **React**: For the frontend, it's the most popular framework with the largest community, according to the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
-- 🐘 **PostgreSQL**: Chosen for the database due to its popularity and strong community support, as indicated by the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
+- 🦛 [**Tapir**](https://tapir.softwaremill.com/en/latest/): For the backend, it's a lightweight library similar to FastAPI, designed for building endpoints and providing free SwaggerUI docs.
+- ⚛️ [**React**](https://react.dev/): For the frontend, it's the most popular framework with the largest community, according to the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
+- 🐘 [**PostgreSQL**](https://www.postgresql.org/): Chosen for the database due to its popularity and strong community support, as indicated by the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
 
 I'm really excited 😄 to demonstrate how productive you can be with this tech stack. Let's start building, shall we! By the way, do you know what "TARP" stands for? 🤣 A tarp functions as a waterproof protective cover, for example, when building tents ⛺.
 
@@ -112,6 +112,119 @@ To ensure the local PostgreSQL setup is correct, you can explore it using the SQ
 If you've reached this point, your local PostgreSQL database is now all set for development! 👍
 
 ### Backend
+
+Let's setup our Scala project! First install:
+
+- ☕️ [Java 17](https://adoptium.net/temurin/releases/?version=17): Because Scala runs on top of JVMs.
+- ⚙️ [Metals](https://scalameta.org/metals/docs/editors/vscode/) VSCode extension: For supporting us while implementing in Scala.
+
+Then two files must be defined:
+
+- `./backend/project/build.properties`: For [SBT](https://www.scala-sbt.org/) (the Scala dependencies manager) version.
+
+```properties title="./backend/project/build.properties"
+# https://github.com/sbt/sbt (look tags for version)
+sbt.version=1.9.9
+```
+
+- `./backend/build.sbt`: For all project metadata and dependencies.
+
+```scala title="./backend/build.sbt"
+/**
+ * Project configurations.
+ */
+ThisBuild / scalaVersion := "2.13.13" // https://www.scala-lang.org/download/all.html
+lazy val root = (project in file(".")).settings(name := "backend")
+
+/**
+ * Dev dependencies.
+ */
+// Cats & Scala extensions
+// https://mvnrepository.com/artifact/org.typelevel/cats-effect
+libraryDependencies += "org.typelevel" %% "cats-effect"        % "3.5.4"
+// https://github.com/oleg-py/better-monadic-for (look tags for version)
+addCompilerPlugin("com.olegpy"         %% "better-monadic-for" % "0.3.1")
+// https://mvnrepository.com/artifact/dev.optics/monocle-core
+libraryDependencies += "dev.optics"    %% "monocle-core"       % "3.2.0"
+// https://mvnrepository.com/artifact/dev.optics/monocle-macro
+libraryDependencies += "dev.optics"    %% "monocle-macro"      % "3.2.0"
+
+// Tapir
+// https://mvnrepository.com/artifact/com.softwaremill.sttp.tapir/tapir-http4s-server
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-http4s-server"     % "1.10.4"
+// https://mvnrepository.com/artifact/com.softwaremill.sttp.tapir/tapir-json-circe
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-json-circe"        % "1.10.4"
+// https://mvnrepository.com/artifact/com.softwaremill.sttp.tapir/tapir-swagger-ui-bundle
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % "1.10.4"
+
+// Http4s
+// https://mvnrepository.com/artifact/org.http4s/http4s-ember-server
+libraryDependencies += "org.http4s" %% "http4s-ember-server" % "0.23.26"
+// https://mvnrepository.com/artifact/org.http4s/http4s-circe
+libraryDependencies += "org.http4s" %% "http4s-circe"        % "0.23.26"
+// https://mvnrepository.com/artifact/org.http4s/http4s-dsl
+libraryDependencies += "org.http4s" %% "http4s-dsl"          % "0.23.26"
+// https://mvnrepository.com/artifact/org.http4s/http4s-ember-client
+libraryDependencies += "org.http4s" %% "http4s-ember-client" % "0.23.26"
+
+// Log4j2
+// https://mvnrepository.com/artifact/org.typelevel/log4cats-core
+libraryDependencies += "org.typelevel" %% "log4cats-core" % "2.6.0"
+// https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+libraryDependencies += "org.slf4j"      % "slf4j-simple"  % "2.0.13"
+
+// Circe
+// https://mvnrepository.com/artifact/io.circe/circe-parser
+libraryDependencies += "io.circe" %% "circe-parser"         % "0.14.6"
+// https://mvnrepository.com/artifact/io.circe/circe-generic
+libraryDependencies += "io.circe" %% "circe-generic"        % "0.14.6"
+// https://mvnrepository.com/artifact/io.circe/circe-generic-extras
+libraryDependencies += "io.circe" %% "circe-generic-extras" % "0.14.3"
+// https://mvnrepository.com/artifact/io.circe/circe-literal
+libraryDependencies += "io.circe" %% "circe-literal"        % "0.14.6"
+
+// Doobie
+// https://mvnrepository.com/artifact/org.tpolecat/doobie-core
+libraryDependencies += "org.tpolecat" %% "doobie-core"     % "1.0.0-RC5"
+// https://mvnrepository.com/artifact/org.tpolecat/doobie-postgres
+libraryDependencies += "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC5"
+// https://mvnrepository.com/artifact/org.tpolecat/doobie-hikari
+libraryDependencies += "org.tpolecat" %% "doobie-hikari"   % "1.0.0-RC5"
+
+// Flyway
+// https://mvnrepository.com/artifact/org.flywaydb/flyway-core
+libraryDependencies += "org.flywaydb" % "flyway-core"                % "10.11.1"
+// https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql
+libraryDependencies += "org.flywaydb" % "flyway-database-postgresql" % "10.11.1" % "runtime"
+
+/**
+ * Test dependencies.
+ */
+// https://mvnrepository.com/artifact/org.scalatest/scalatest
+libraryDependencies += "org.scalatest" %% "scalatest"          % "3.2.18"  % Test
+// https://mvnrepository.com/artifact/org.mockito/mockito-scala
+libraryDependencies += "org.mockito"   %% "mockito-scala"      % "1.17.31" % Test
+// https://mvnrepository.com/artifact/org.mockito/mockito-scala-cats
+libraryDependencies += "org.mockito"   %% "mockito-scala-cats" % "1.17.31" % Test
+```
+
+To ask Metals to setup the Scala environment and install the dependencies:
+
+- `CTRL + SHIFT + P`
+- `Metals: Import build`
+
+Then go to the Metals extension view, to confirm it's correctly setup 😎:
+
+<figure markdown="span">
+  ![Metals extension](image-5.png)
+  <figcaption>Metals extension</figcaption>
+</figure>
+
+!!! warning
+
+    [Metals uses VSCode workspaces setup](https://scalameta.org/metals/blog/2023/07/17/workspace-folders) to detect Scala project. So, it's important to have correctly setup VSCode workspaces like explained previously!
+
+Let's start implementing a simple RestAPI Tapir backend and database Driver. Basically four files: #TODO James: To continue
 
 ### Frontend
 
