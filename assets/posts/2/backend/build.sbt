@@ -64,3 +64,13 @@ libraryDependencies += "org.tpolecat" %% "doobie-hikari"   % "1.0.0-RC5"
 libraryDependencies += "org.flywaydb" % "flyway-core"                % "10.11.1"
 // https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql
 libraryDependencies += "org.flywaydb" % "flyway-database-postgresql" % "10.11.1" % "runtime"
+
+/**
+ * Test dependencies.
+ */
+// https://mvnrepository.com/artifact/org.scalatest/scalatest
+libraryDependencies += "org.scalatest" %% "scalatest"          % "3.2.18"  % Test
+// https://mvnrepository.com/artifact/org.mockito/mockito-scala
+libraryDependencies += "org.mockito"   %% "mockito-scala"      % "1.17.31" % Test
+// https://mvnrepository.com/artifact/org.mockito/mockito-scala-cats
+libraryDependencies += "org.mockito"   %% "mockito-scala-cats" % "1.17.31" % Test

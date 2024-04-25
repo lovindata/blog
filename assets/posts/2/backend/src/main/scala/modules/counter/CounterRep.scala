@@ -7,7 +7,7 @@ import doobie.ConnectionIO
 import doobie.implicits._
 import modules.counter.CounterMod
 
-final case class CounterRep()(implicit dbConf: DbConf) {
+case class CounterRep()(implicit dbConf: DbConf) {
   def getOrCreate: ConnectionIO[CounterMod] = {
     def createIfNotFound(counterFound: Option[CounterMod]): ConnectionIO[CounterMod] = counterFound match {
       case Some(counter) => counter.pure[ConnectionIO]

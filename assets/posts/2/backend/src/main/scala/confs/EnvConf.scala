@@ -1,6 +1,6 @@
 package confs
 
-case class EnvConf() {
+final case class EnvConf() {
   private val allEnvVar: Map[String, String] = sys.env
 
   val devMode: Boolean = allEnvVar.getOrElse("TARP_DEV_MODE", default = "true") == "true"

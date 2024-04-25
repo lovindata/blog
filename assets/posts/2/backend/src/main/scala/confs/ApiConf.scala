@@ -24,7 +24,10 @@ import sttp.tapir.files.staticFilesGetServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
-case class ApiConf()(implicit envConf: EnvConf, counterCtrl: CounterCtrl, logger: Logger[IO] = Slf4jLogger.getLogger) {
+final case class ApiConf()(implicit
+    envConf: EnvConf,
+    counterCtrl: CounterCtrl,
+    logger: Logger[IO] = Slf4jLogger.getLogger) {
   def setup: IO[Unit] = for {
     port      <-
       IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))

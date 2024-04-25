@@ -1,7 +1,9 @@
 package modules.counter
 
 import cats.effect.IO
+import cats.implicits._
 import confs.DbConf
+import doobie.ConnectionIO
 
 final case class CounterSvc()(implicit dbConf: DbConf, counterRep: CounterRep) {
   def getOrCreate: IO[Long] = dbConf.run(counterRep.getOrCreate.map(_.count))
