@@ -478,6 +478,177 @@ If you relaunch your backend application, you should see some logs indicating su
 
 ### Backend
 
+Backend development time! 😍 In order to make our counter application work:
+
+- First, let's define the **application object**.
+
+```scala title="./backend/src/main/modules/counter/CounterMod.scala"
+package modules.counter
+
+import monocle.syntax.all._
+
+case class CounterMod(id: Long, count: Long) {
+  def addOne: CounterMod = this.focus(_.count).modify(_ + 1)
+}
+```
+
+- Second, the **application logic and persistence**.
+
+```scala title="./backend/src/main/modules/counter/CounterSvc.scala"
+package modules.counter
+
+import cats.effect.IO
+import cats.implicits._
+import confs.DbConf
+import doobie.ConnectionIO
+
+final case class CounterSvc()(implicit dbConf: DbConf, counterRep: CounterRep) {
+  def getOrCreate: IO[Long] = dbConf.run(counterRep.getOrCreate.map(_.count))
+
+  def addOne: IO[Long] = dbConf.run(for { // Runs atomically within the same database transaction
+    counter       <- counterRep.getOrCreate
+    counterUpdated = counter.addOne
+    _             <- counterRep.update(counterUpdated)
+    count          = counterUpdated.count
+  } yield count)
+}
+
+object CounterSvc { implicit val impl: CounterSvc = CounterSvc() }
+```
+
+```scala title="./backend/src/main/modules/counter/CounterRep.scala"
+package modules.counter
+
+import cats.effect.IO
+import cats.implicits._
+import confs.DbConf
+import doobie.ConnectionIO
+import doobie.implicits._
+import modules.counter.CounterMod
+
+case class CounterRep()(implicit dbConf: DbConf) {
+  def getOrCreate: ConnectionIO[CounterMod] = {
+    def createIfNotFound(counterFound: Option[CounterMod]): ConnectionIO[CounterMod] = counterFound match {
+      case Some(counter) => counter.pure[ConnectionIO]
+      case None          =>
+        sql"""|INSERT INTO counter (count)
+              |VALUES (0);""".stripMargin.update.withUniqueGeneratedKeys[Long]("id") >>=
+          (id => sql"""|SELECT *
+                       |FROM counter
+                       |WHERE id = $id;""".stripMargin.query[CounterMod].unique)
+    }
+
+    for {
+      counterFound <- sql"""|SELECT *
+                            |FROM counter
+                            |WHERE id = 1;""".stripMargin.query[CounterMod].option
+      counter      <- createIfNotFound(counterFound)
+    } yield counter
+  }
+
+  def update(counter: CounterMod): ConnectionIO[Unit] =
+    sql"""|UPDATE counter
+          |SET count = ${counter.count};""".stripMargin.update.run.void
+}
+
+object CounterRep { implicit val impl: CounterRep = CounterRep() }
+```
+
+- Lastly, the **application entry points**. Let's also move our logger middleware only to application entry points.
+
+```scala title="./backend/src/main/modules/counter/CounterCtrl.scala"
+package modules.counter
+
+import cats.effect.IO
+import cats.implicits._
+import org.http4s.HttpRoutes
+import sttp.tapir._
+import sttp.tapir.json.circe._
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+
+final case class CounterCtrl()(implicit counterSvc: CounterSvc) {
+  def endpoints: List[AnyEndpoint] = List(getEpt, addOneEpt)
+  def routes: HttpRoutes[IO]       = getRts <+> addOneRts
+
+  private val getEpt = endpoint.summary("Get counter").get.in("api" / "counter").out(jsonBody[Long])
+  private val getRts = Http4sServerInterpreter[IO]().toRoutes(getEpt.serverLogicSuccess(_ => counterSvc.getOrCreate))
+
+  private val addOneEpt =
+    endpoint.summary("Add one to counter").post.in("api" / "counter" / "add-one").out(jsonBody[Long])
+  private val addOneRts = Http4sServerInterpreter[IO]().toRoutes(addOneEpt.serverLogicSuccess(_ => counterSvc.addOne))
+}
+
+object CounterCtrl { implicit val impl: CounterCtrl = CounterCtrl() }
+```
+
+Then, make all these components accessible for the frontend. Let's wrap up by exposing our new endpoints.
+
+```scala title="./backend/src/main/scala/confs/ApiConf.scala" hl_lines="38 50"
+package confs
+
+import cats.effect.IO
+import cats.implicits._
+import com.comcast.ip4s.IpLiteralSyntax
+import com.comcast.ip4s.Port
+import modules.counter.CounterCtrl
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.middleware.{Logger => LoggerMiddleware}
+import org.http4s.server.middleware.CORS
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.syntax.LoggerInterpolator
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
+final case class ApiConf()(implicit
+    envConf: EnvConf,
+    counterCtrl: CounterCtrl,
+    logger: Logger[IO] = Slf4jLogger.getLogger) {
+  def setup: IO[Unit] = for {
+    port      <-
+      IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))
+    corsPolicy = CORS.policy.withAllowOriginHostCi(_ =>
+                   envConf.devMode) // Essential for local development setup with an SPA running on a separate port
+    _         <- EmberServerBuilder
+                   .default[IO]
+                   .withHost(ipv4"0.0.0.0")                    // Accept connections from any available network interface
+                   .withPort(port)                             // On a given port
+                   .withHttpApp(corsPolicy(allRts).orNotFound) // Link all routes to the backend server
+                   .build
+                   .use(_ => IO.never)
+                   .start
+                   .void
+  } yield ()
+
+  private val docsEpt =
+    SwaggerInterpreter().fromEndpoints[IO](counterCtrl.endpoints, // Here's where the new endpoint definition is added!
+                                           "Backend – TARP Stack ⛺",
+                                           "1.0")
+  private val allRts  = {
+    val loggerMiddleware =
+      LoggerMiddleware.httpRoutes(                 // To log incoming requests or outgoing responses from the server
+        logHeaders = true,
+        logBody = true,
+        redactHeadersWhen = _ => !envConf.devMode, // Display header values exclusively during development mode
+        logAction = Some((msg: String) => info"$msg")
+      )(_)
+    Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+>
+      loggerMiddleware(counterCtrl.routes) // Here's where the new endpoint logic is added!
+  }
+}
+
+object ApiConf { implicit val impl: ApiConf = ApiConf() }
+```
+
+Let's have some fun with our two endpoints at [http://localhost:8080/docs/](http://localhost:8080/docs/) 🤩!
+
+<figure markdown="span">
+  ![Endpoint interaction via SwaggerUI](image-11.png)
+  <figcaption>Endpoint interaction via SwaggerUI</figcaption>
+</figure>
+
+As you can see, it's possible to interact with your endpoints directly via SwaggerUI.
+
 ### Frontend
 
 ## 🎁 Wrapping Up For Production
