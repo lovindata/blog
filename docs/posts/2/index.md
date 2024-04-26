@@ -10,7 +10,7 @@ categories:
   - DevOps
 ---
 
-I landed my first job as a Data Engineer using Scala. It's been over 3 years now, approaching 4 years. The more experience you gain, the more you want to spread your wings 🪽 to tackle even bigger and more complex projects than just data pipelines, like developing **full-stack web data applications**. But, I really do not want to dissipate myself too much on all the programming languages, libraries, or frameworks out there 😣. These are just tools. What's important is how efficiently you can use them for the product or feature you envisioned 🦄🌈. Sooo! For me, it's currently the **TARP** tech stack!
+I landed my first job as a Data Engineer using [Scala](https://www.scala-lang.org/). It's been over 3 years now, approaching 4 years. The more experience you gain, the more you want to spread your wings 🪽 to tackle even bigger and more complex projects than just data pipelines, like developing **full-stack web data applications**. But, I really do not want to dissipate myself too much on all the programming languages, libraries, or frameworks out there 😣. These are just tools. What's important is how efficiently you can use them for the product or feature you envisioned 🦄🌈. Sooo! For me, it's currently the **TARP** tech stack!
 
 <!-- more -->
 
@@ -20,7 +20,7 @@ I landed my first job as a Data Engineer using Scala. It's been over 3 years now
 
 **TARP** stands for **Tapir**, **React** and **PostgreSQL**. In detail:
 
-- 🦛 [**Tapir**](https://tapir.softwaremill.com/en/latest/): For the backend, it's a lightweight library similar to FastAPI, designed for building endpoints and providing free SwaggerUI docs.
+- 🦛 [**Tapir**](https://tapir.softwaremill.com/en/latest/): For the backend, it's a lightweight library similar to [FastAPI](https://fastapi.tiangolo.com/), designed for building endpoints and providing free SwaggerUI docs.
 - ⚛️ [**React**](https://react.dev/): For the frontend, it's the most popular framework with the largest community, according to the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
 - 🐘 [**PostgreSQL**](https://www.postgresql.org/): Chosen for the database due to its popularity and strong community support, as indicated by the [Stack Overflow Developer Survey 2023](https://survey.stackoverflow.co/2023/#section-admired-and-desired-web-frameworks-and-technologies).
 
@@ -374,16 +374,48 @@ object Main extends IOApp.Simple {
 }
 ```
 
-In VSCode, after your code has compiled, you should see a `Run` ▶️ button appear above your `./backend/src/main/scala/Main.scala` class. Click 👆 on it, then go to http://localhost:8080/docs/ to see if it worked!
+In VSCode, after your code has compiled, you should see a `Run` ▶️ button appear above your `./backend/src/main/scala/Main.scala` class. Click 👆 on it, then go to [http://localhost:8080/docs/](http://localhost:8080/docs/) to see if it worked!
 
 <figure markdown="span">
   ![SwaggerUI](image-6.png)
   <figcaption>SwaggerUI</figcaption>
 </figure>
 
-[SwaggerUI](https://swagger.io/tools/swagger-ui/) is available to document your endpoints for the frontend team. For now, we have none, but that will change in the second section when we start building application logic. Let's continue with setting up the frontend development environment.
+[SwaggerUI](https://swagger.io/tools/swagger-ui/) is accessible for documenting your endpoints for the frontend team. Currently, there are none, but that will change in the second section when we begin building application logic. Let's proceed with setting up the frontend development environment.
 
 ### Frontend
+
+To begin, we need to install [Node.js](https://nodejs.org/en). It's necessary for running [npm](https://www.npmjs.com/) commands and installing dependencies. One of the first dependencies we need is a build tool for frontend SPAs. There are quite a few out there, but for me, [Vite](https://vitejs.dev/) is the best and fastest when it comes to building SPAs with React. To create a React project using Vite:
+
+- Look at your VSCode navigation bar at the top > Click on `Terminal` > Click on `frontend` > A terminal for `./frontend` should appear
+- Then run `npm init vite@latest` and follow the instructions
+
+For the instructions, make sure to:
+
+- Create your project at `./frontend`
+- Use `React` and not be baited by `Preact` 😂
+- Select `TypeScript + SWC` for TypeScript compilation, which includes a [Rust-based](https://www.rust-lang.org/) engine for SPEEEEEEEED! 💨
+
+Files should magically appear in your `./frontend` VSCode workspace! 🌈 Now, let's install the dependencies defined in `./frontend/package.json`. To do that, run the following command:
+
+```bash
+npm install
+```
+
+You should see a folder `./node_modules` appear, where all the dependencies will now reside. From this point, you can run the predefined application that Vite gave you when we initialized the project:
+
+```bash
+npm run dev
+```
+
+Then, navigate to [http://localhost:5173/](http://localhost:5173/).
+
+<figure markdown="span">
+  ![Vite + React page](image-7.png)
+  <figcaption>Vite + React page</figcaption>
+</figure>
+
+Congratulations, your frontend development environment has been successfully set up ✅. The development team behind Vite has truly done an amazing job to make it so easy! 😌
 
 ## 🏗️ Building Your Application
 
