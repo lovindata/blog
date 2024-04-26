@@ -28,7 +28,7 @@ I'm really excited 😄 to demonstrate how productive you can be with this tech 
 
 ## 👨‍💻 Development Environment
 
-For your coding environment, I highly recommend using [VSCode](https://code.visualstudio.com/). It has amazing support for [TypeScript](https://www.typescriptlang.org/) and [Docker](https://www.docker.com/) with various extensions. Scala development can also be done on VSCode using the [Metals](https://scalameta.org/metals/docs/editors/vscode/) extension. I used to develop on IntelliJ, but got tired of switching between VSCode and [IntelliJ](https://www.jetbrains.com/idea/) 😫. So yeah, if you have to handle more than just Scala code, just go with VS Code 😋.
+For your coding environment, I highly recommend using [VSCode](https://code.visualstudio.com/). It has amazing support for [TypeScript](https://www.typescriptlang.org/) and [Docker](https://www.docker.com/) with various extensions. Scala development can also be done on VSCode using the [Metals](https://scalameta.org/metals/docs/editors/vscode/) extension. I used to develop on IntelliJ, but got tired of switching between VSCode and [IntelliJ](https://www.jetbrains.com/idea/) 😫. So yeah, if you have to handle more than just Scala code, just go with VSCode 😋.
 
 Let's create 3 folders: `./devops`, `./backend`, `./frontend`, and also the `./vscode.code-workspace` file.
 
@@ -55,12 +55,14 @@ You've just organized your project into [VSCode workspaces](https://code.visuals
   <figcaption>VSCode workspaces</figcaption>
 </figure>
 
-At the end of this section, you should have established a well-structured VSCode folder for your FullStack application.
+The goal of this section is to establish a well-structured VSCode folder for your FullStack application as shown below 👇.
 
 <figure markdown="span">
   ![Folder structure](image-1.png)
   <figcaption>Folder structure</figcaption>
 </figure>
+
+Let's start! 😤
 
 ### Database
 
@@ -113,21 +115,21 @@ If you've reached this point, your local PostgreSQL database is now all set for 
 
 ### Backend
 
-Let's setup our Scala project! First install:
+Let's set up our Scala project! First, install:
 
-- ☕️ [Java 17](https://adoptium.net/temurin/releases/?version=17): Because Scala runs on top of JVMs.
-- ⚙️ [Metals](https://scalameta.org/metals/docs/editors/vscode/) VSCode extension: For supporting us while implementing in Scala.
+- ☕️ [Java 17](https://adoptium.net/temurin/releases/?version=17): Because Scala runs on top of the JVM.
+- ⚙️ [Metals](https://scalameta.org/metals/docs/editors/vscode/) VSCode extension: For supporting us during implementation in Scala.
 
-Then two files must be defined:
+Then, two files must be defined:
 
-- `./backend/project/build.properties`: For [SBT](https://www.scala-sbt.org/) (the Scala dependencies manager) version.
+- `./backend/project/build.properties`: For specifying the [SBT](https://www.scala-sbt.org/) (the Scala dependencies manager) version.
 
 ```properties title="./backend/project/build.properties"
 # https://github.com/sbt/sbt (look tags for version)
 sbt.version=1.9.9
 ```
 
-- `./backend/build.sbt`: For all project metadata and dependencies.
+- `./backend/build.sbt`: For project metadata and dependencies.
 
 ```scala title="./backend/build.sbt"
 /**
@@ -208,12 +210,12 @@ libraryDependencies += "org.mockito"   %% "mockito-scala"      % "1.17.31" % Tes
 libraryDependencies += "org.mockito"   %% "mockito-scala-cats" % "1.17.31" % Test
 ```
 
-To ask Metals to setup the Scala environment and install the dependencies:
+To instruct Metals to set up the Scala environment and install the dependencies:
 
 - `CTRL + SHIFT + P`
 - `Metals: Import build`
 
-Then go to the Metals extension view, to confirm it's correctly setup 😎:
+Then, go to the Metals extension view to confirm it's correctly set up 😎:
 
 <figure markdown="span">
   ![Metals extension](image-5.png)
@@ -222,9 +224,164 @@ Then go to the Metals extension view, to confirm it's correctly setup 😎:
 
 !!! warning
 
-    [Metals uses VSCode workspaces setup](https://scalameta.org/metals/blog/2023/07/17/workspace-folders) to detect Scala project. So, it's important to have correctly setup VSCode workspaces like explained previously!
+    [Metals uses VSCode workspace setup](https://scalameta.org/metals/blog/2023/07/17/workspace-folders) to detect Scala projects. So, it's important to have correctly set up VSCode workspaces as explained previously!
 
-Let's start implementing a simple RestAPI Tapir backend and database Driver. Basically four files: #TODO James: To continue
+We're also going to initialize the backend API and database driver.
+
+- First, set up the environement variables 🔑.
+
+```scala title="./backend/src/main/scala/confs/EnvConf.scala"
+package confs
+
+case class EnvConf() {
+  private val allEnvVar: Map[String, String] = sys.env
+
+  val devMode: Boolean =
+    allEnvVar.getOrElse("TARP_DEV_MODE",
+                        default = "true") == "true" // To handle different behaviors in dev and prod environments
+  val port: Int = allEnvVar.getOrElse("TARP_PORT", default = "8080").toInt
+
+  val postgresIp: String       = allEnvVar.getOrElse("TARP_POSTGRES_IP", default = "localhost")
+  val postgresPort: Int        = allEnvVar.getOrElse("TARP_POSTGRES_PORT", default = "5432").toInt
+  val postgresDb: String       = allEnvVar.getOrElse("TARP_POSTGRES_DB", default = "tarp")
+  val postgresUser: String     = allEnvVar.getOrElse("TARP_POSTGRES_USER", default = "tarp")
+  val postgresPassword: String = allEnvVar.getOrElse("TARP_POSTGRES_PASSWORD", default = "tarp")
+  val postgresSchema: String   = allEnvVar.getOrElse("TARP_POSTGRES_SCHEMA", default = "tarp")
+}
+
+object EnvConf { implicit val impl: EnvConf = EnvConf() }
+```
+
+- Second, integrate 🦛 Tapir using [http4s](https://http4s.org/v0.23/docs/quickstart.html) under the hood.
+
+```scala title="./backend/src/main/scala/confs/ApiConf.scala"
+package confs
+
+import cats.effect.IO
+import cats.implicits._
+import com.comcast.ip4s.IpLiteralSyntax
+import com.comcast.ip4s.Port
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.middleware.{Logger => LoggerMiddleware}
+import org.http4s.server.middleware.CORS
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.syntax.LoggerInterpolator
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
+case class ApiConf()(implicit envConf: EnvConf, logger: Logger[IO] = Slf4jLogger.getLogger) {
+  def setup: IO[Unit] = for {
+    port      <-
+      IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))
+    corsPolicy = CORS.policy.withAllowOriginHostCi(_ =>
+                   envConf.devMode) // Essential for local development setup with an SPA running on a separate port
+    _         <- EmberServerBuilder
+                   .default[IO]
+                   .withHost(ipv4"0.0.0.0")                    // Accept connections from any available network interface
+                   .withPort(port)                             // On a given port
+                   .withHttpApp(corsPolicy(allRts).orNotFound) // Link all routes to the backend server
+                   .build
+                   .use(_ => IO.never)
+                   .start
+                   .void
+  } yield ()
+
+  private val docsEpt =
+    SwaggerInterpreter().fromEndpoints[IO](List.empty, "Backend – TARP Stack ⛺", "1.0")
+  private val allRts  = {
+    val loggerMiddleware =
+      LoggerMiddleware.httpRoutes(                 // To log incoming requests or outgoing responses from the server
+        logHeaders = true,
+        logBody = true,
+        redactHeadersWhen = _ => !envConf.devMode, // Display header values exclusively during development mode
+        logAction = Some((msg: String) => info"$msg")
+      )(_)
+    loggerMiddleware(Http4sServerInterpreter[IO]().toRoutes(docsEpt))
+  }
+}
+
+object ApiConf { implicit val impl: ApiConf = ApiConf() }
+```
+
+- Lastly, integrate the database driver. Utilize a combination of [Doobie](https://tpolecat.github.io/doobie/) for interacting with our database and ♻️ [Flyway](https://github.com/flyway/flyway) to manage the database schema lifecycle changes.
+
+```scala title="./backend/src/main/scala/confs/DbConf.scala"
+package confs
+
+import cats.effect.IO
+import cats.effect.Resource
+import doobie.ConnectionIO
+import doobie.hikari.HikariTransactor
+import doobie.implicits._
+import doobie.util.ExecutionContexts
+import org.flywaydb.core.Flyway
+
+case class DbConf()(implicit envConf: EnvConf) {
+  def setup: IO[Unit] = {
+    def raiseUnlessDbUp: IO[Unit] = for {
+      isUp <- run(sql"SELECT 1;".query[Long].unique.map(_ == 1L))
+      _    <- IO.raiseUnless(isUp)(new RuntimeException(s"Postgres ${envConf.postgresDb} database is down."))
+    } yield ()
+    def migrate: IO[Unit]         = IO.blocking {
+      Flyway.configure
+        .dataSource(
+          s"jdbc:postgresql://${envConf.postgresIp}:${envConf.postgresPort}/${envConf.postgresDb}?currentSchema=${envConf.postgresSchema}",
+          envConf.postgresUser,
+          envConf.postgresPassword
+        )
+        .group(true)
+        .table("flyway")                 // ⚠️ "flyway" as migration table history (in 'currentSchema' see above)
+        .locations("conf/DbConf/flyway") // ".sql" files migration resource path
+        .failOnMissingLocations(true)
+        .load
+        .migrate                         // Auto create schema if not exists & Rollback raise exception if failed
+    }
+
+    for {
+      _ <- raiseUnlessDbUp
+      _ <- migrate
+    } yield ()
+  }
+
+  def run[A](sqls: ConnectionIO[A]): IO[A] = transactor.use(sqls.transact[IO])
+
+  private val transactor: Resource[IO, HikariTransactor[IO]] = for {
+    ce <- ExecutionContexts.fixedThreadPool[IO](32)
+    xa <- HikariTransactor.newHikariTransactor[IO](
+            "org.postgresql.Driver",
+            s"jdbc:postgresql://${envConf.postgresIp}:${envConf.postgresPort}/${envConf.postgresDb}?currentSchema=${envConf.postgresSchema}",
+            envConf.postgresUser,
+            envConf.postgresPassword,
+            ce
+          )
+  } yield xa
+}
+
+object DbConf { implicit val impl: DbConf = DbConf() }
+```
+
+- Finally, create a Main class entry point to enable all these components to run.
+
+```scala title="./backend/src/main/scala/Main.scala"
+import cats.effect.IO
+import cats.effect.IOApp
+import confs.ApiConf
+import confs.DbConf
+
+object Main extends IOApp.Simple {
+  override def run: IO[Unit] = DbConf.impl.setup >> ApiConf.impl.setup >> IO.never
+}
+```
+
+In VSCode, after your code has compiled, you should see a `Run` ▶️ button appear above your `./backend/src/main/scala/Main.scala` class. Click 👆 on it, then go to http://localhost:8080/docs/ to see if it worked!
+
+<figure markdown="span">
+  ![SwaggerUI](image-6.png)
+  <figcaption>SwaggerUI</figcaption>
+</figure>
+
+[SwaggerUI](https://swagger.io/tools/swagger-ui/) is available to document your endpoints for the frontend team. For now, we have none, but that will change in the second section when we start building application logic. Let's continue with setting up the frontend development environment.
 
 ### Frontend
 
