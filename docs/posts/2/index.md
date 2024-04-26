@@ -385,7 +385,7 @@ In VSCode, after your code has compiled, you should see a `Run` ▶️ button ap
 
 ### Frontend
 
-To begin, we need to install [Node.js](https://nodejs.org/en). It's necessary for running [npm](https://www.npmjs.com/) commands and installing dependencies. One of the first dependencies we need is a build tool for frontend SPAs. There are quite a few out there, but for me, [Vite](https://vitejs.dev/) is the best and fastest when it comes to building SPAs with React. To create a React project using Vite:
+To begin, we need to install [Node.js](https://nodejs.org/en). It's necessary for running [npm](https://www.npmjs.com/) commands and installing dependencies. One of the first dependencies we need is a build tool for frontend [SPAs](https://en.wikipedia.org/wiki/Single-page_application). There are quite a few out there, but for me, [Vite](https://vitejs.dev/) is the best and fastest when it comes to building SPAs with React. To create a React project using Vite:
 
 - Look at your VSCode navigation bar at the top > Click on `Terminal` > Click on `frontend` > A terminal for `./frontend` should appear
 - Then run `npm init vite@latest` and follow the instructions
@@ -393,8 +393,8 @@ To begin, we need to install [Node.js](https://nodejs.org/en). It's necessary fo
 For the instructions, make sure to:
 
 - Create your project at `./frontend`
-- Use `React` and not be baited by `Preact` 😂
-- Select `TypeScript + SWC` for TypeScript compilation, which includes a [Rust-based](https://www.rust-lang.org/) engine for SPEEEEEEEED! 💨
+- Use `React` and not be baited by [`Preact`](https://preactjs.com/) 😂
+- Select [`TypeScript + SWC`](https://swc.rs/) for TypeScript compilation, which includes a [Rust-based](https://www.rust-lang.org/) engine for SPEEEEEEEED! 💨
 
 Files should magically appear in your `./frontend` VSCode workspace! 🌈 Now, let's install the dependencies defined in `./frontend/package.json`. To do that, run the following command:
 
@@ -411,15 +411,70 @@ npm run dev
 Then, navigate to [http://localhost:5173/](http://localhost:5173/).
 
 <figure markdown="span">
-  ![Vite + React page](image-7.png)
-  <figcaption>Vite + React page</figcaption>
+  !["Vite + React" page](image-7.png)
+  <figcaption>"Vite + React" page</figcaption>
 </figure>
 
 Congratulations, your frontend development environment has been successfully set up ✅. The development team behind Vite has truly done an amazing job to make it so easy! 😌
 
 ## 🏗️ Building Your Application
 
+From the previous section, you should have these three services running locally:
+
+- 🦛 A Tapir backend with a database driver ready for interaction ▶️
+- ⚛️ A React frontend serving the UI 💁‍♂️
+- 🐘 A PostgreSQL database up and running 🫡
+
+!!! note
+
+    It's possible that you don't have exactly the same files in each folder `./backend`, `./frontend`, and `./devops` as presented in the `Folder structure` figure. This may be due to updates that occurred in the libraries or tools used, or simply because I did not take the time to present all non-mandatory details 🧐. So, if you would like to have exactly the same, don't hesitate to check directly on [GitHub](https://github.com/lovindata/blog/tree/main/assets/posts/2)!
+
+Now, the mission will be to implement some application logic. Nothing overly complicated, but **comprehensive**. This must involve:
+
+- **Interaction between PostgreSQL and the Tapir backend server**
+- **Interaction between the Tapir backend server and the React frontend**
+
+What about making our last button persistent? 🤔 You know, this one:
+
+<figure markdown="span">
+  ![Button clicked 1000 times](image-8.png)
+  <figcaption>Button clicked 1000 times</figcaption>
+</figure>
+
+Currently, I lose all my hard work 😩 if I refresh the page 🔃. BUUUUUUUUT, if it's persisted in the database, it will still be there even if I refresh the page 😏!
+
+<figure markdown="span">
+  ![Frontend, Backend and Database interactions](image-9.png)
+  <figcaption>Frontend, Backend and Database interactions</figcaption>
+</figure>
+
+So let's do it! 💪 To be clear, saving a button state in the database makes zero sense 😂!
+
 ### Database
+
+States are stored in PostgreSQL using tables, so we need to create a table for them. Since there is only one button state, it will consist of a single row with an ID and a count value.
+
+Do you recall **Flyway** from when we worked on the backend? If you check your SQLTools view, you should see a schema named `tarp`. This schema was created when the Scala backend was launched, specifically when the `_.migrate` operation completed.
+
+The `tarp` schema is currently managed by Flyway. Our goal here is to instruct Flyway to create our counter table during the `_.migrate` operation.
+
+```sql title="./backend/src/main/resources/conf/DbConf/flyway/V0__counter_create_table.sql"
+CREATE TABLE IF NOT EXISTS tarp.counter(
+    id BIGSERIAL PRIMARY KEY,
+    count BIGINT NOT NULL
+);
+```
+
+If you relaunch your backend application, you should see some logs indicating successful migration and a **new table in your SQLTools view**.
+
+<figure markdown="span">
+  ![Flyway schema migration](image-10.png)
+  <figcaption>Flyway schema migration</figcaption>
+</figure>
+
+!!! info
+
+    Database schema changes are an inevitable part of **continuous application development**. As your application evolves, you may need to add or remove columns from existing tables. These changes are closely tied to your backend application logic. One way to address this challenge is to perform **database schema migration upon application launch** and manage all **changes as closely as possible to your backend code**. That's why you see the ***.sql files defined in our backend folder**. This is just one approach; I encourage you to explore other possible solutions.
 
 ### Backend
 
