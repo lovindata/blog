@@ -905,7 +905,118 @@ Are you feeling the power of the FullStack developer rising within you right now
 
 ## 🎁 Wrapping Up For Production
 
+From the previous section, you should have these three services running and interacting locally:
+
+- 🦛 A Tapir backend with 2 exposed endpoints and handling database requests on endpoint invocation ▶️
+- ⚛️ A React frontend consuming the 2 exposed endpoints 💁‍♂️
+- 🐘 A PostgreSQL database with one table storing the click count 🫡
+
+Now, the mission will be to prepare for production using Docker. More precisely, **build a Docker image** for our DevOps team to deploy. The Docker container has to be able to serve our frontend and backend simultaneously. However, currently our Tapir backend and React frontend are running on two different servers. So, I'm going to show you how you can **serve your React SPA using Tapir**.
+
+<figure markdown="span">
+  ![SPA Frontend = Static files for the browser to interpret](image-13.png)
+  <figcaption>SPA Frontend = Static files for the browser to interpret</figcaption>
+</figure>
+
 ### Serving React via Tapir
+
+To serve your React SPA via Tapir, there are only 2 steps:
+
+- Build your React SPA into a distributable 🎁 package.
+
+```bash
+npm run build
+```
+
+<figure markdown="span">
+  ![npm run build](image-14.png)
+  <figcaption>npm run build</figcaption>
+</figure>
+
+- Serve this distributable via a Tapir endpoint.
+
+```scala title="./backend/src/main/scala/confs/ApiConf.scala" hl_lines="40-47 52 65"
+package confs
+
+import cats.effect.IO
+import cats.implicits._
+import com.comcast.ip4s.IpLiteralSyntax
+import com.comcast.ip4s.Port
+import modules.counter.CounterCtrl
+import org.http4s.ember.server.EmberServerBuilder
+import org.http4s.server.middleware.{Logger => LoggerMiddleware}
+import org.http4s.server.middleware.CORS
+import org.typelevel.log4cats.Logger
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.syntax.LoggerInterpolator
+import sttp.tapir.emptyInput
+import sttp.tapir.files.FilesOptions
+import sttp.tapir.files.staticFilesGetServerEndpoint
+import sttp.tapir.server.http4s.Http4sServerInterpreter
+import sttp.tapir.swagger.bundle.SwaggerInterpreter
+
+final case class ApiConf()(implicit
+    envConf: EnvConf,
+    counterCtrl: CounterCtrl,
+    logger: Logger[IO] = Slf4jLogger.getLogger) {
+  def setup: IO[Unit] = for {
+    port      <-
+      IO.fromOption(Port.fromInt(envConf.port))(new RuntimeException(s"Not processable port number ${envConf.port}."))
+    corsPolicy = CORS.policy.withAllowOriginHostCi(_ =>
+                   envConf.devMode) // Essential for local development setup with an SPA running on a separate port
+    _         <- EmberServerBuilder
+                   .default[IO]
+                   .withHost(ipv4"0.0.0.0")                    // Accept connections from any available network interface
+                   .withPort(port)                             // On a given port
+                   .withHttpApp(corsPolicy(allRts).orNotFound) // Link all routes to the backend server
+                   .build
+                   .use(_ => IO.never)
+                   .start
+                   .void
+  } yield ()
+
+  private val frontendServerLogic =
+    staticFilesGetServerEndpoint[IO](emptyInput)(
+      "../frontend/dist",                                  // Serve frontend static files from '../frontend/dist' at '/'
+      FilesOptions.default.defaultFile(List("index.html")) // Serve '../frontend/dist/index.html' if not found
+    )
+  private val frontendEpt         =
+    frontendServerLogic.endpoint.summary("Frontend served from '../frontend/dist' on the file system")
+  private val frontendRts         = Http4sServerInterpreter[IO]().toRoutes(frontendServerLogic)
+
+  private val docsEpt =
+    SwaggerInterpreter().fromEndpoints[IO](
+      counterCtrl.endpoints :+ // Here's where the new endpoint definition is added!
+        frontendEpt,
+      "Backend – TARP Stack ⛺",
+      "1.0")
+  private val allRts  = {
+    val loggerMiddleware =
+      LoggerMiddleware.httpRoutes(                 // To log incoming requests or outgoing responses from the server
+        logHeaders = true,
+        logBody = true,
+        redactHeadersWhen = _ => !envConf.devMode, // Display header values exclusively during development mode
+        logAction = Some((msg: String) => info"$msg")
+      )(_)
+    Http4sServerInterpreter[IO]().toRoutes(docsEpt) <+>
+      loggerMiddleware(counterCtrl.routes) <+> // Here's where the new endpoint logic is added!
+      frontendRts // Endpoints are resolved by order, so it's crucial to place frontend logic last! Otherwise, it will always serve 'index.html'!
+  }
+}
+
+object ApiConf { implicit val impl: ApiConf = ApiConf() }
+```
+
+Then we're done! 👏 Already?! Yep, Tapir's `staticFilesGetServerEndpoint` method did everything for us 😌. If you go to [http://localhost:8080](http://localhost:8080) while running only your backend, you should see your frontend being served.
+
+<figure markdown="span">
+  ![Serving React via Tapir](image-15.png)
+  <figcaption>Serving React via Tapir</figcaption>
+</figure>
+
+!!! warning
+
+    Two crucial rules to adhere to when serving any frontend SPA application from your custom backend: Firstly, **it's imperative to avoid using `/api` or any other subpath used by the backend for routing within the frontend**. Secondly, ensure that the backend serves **`index.html` in case of a non-existent endpoint, giving back control of the browser's routing to the frontend**.
 
 ### Optimized Docker Build
 
