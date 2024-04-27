@@ -1020,4 +1020,16 @@ Then we're done! 👏 Already?! Yep, Tapir's `staticFilesGetServerEndpoint` meth
 
 ### Optimized Docker Build
 
+Final and last part! The docker image build.
+
 ## 🌟 Full-Stack Developer Reached!
+
+If you've reached this conclusion, big congratulations! 🎉 You are now a fellow **FullStack developer, master of the TARP stack** 😎. Know this, the fun is only just beginning because you now have the superpower to build your own application 😯! If you do, please don't hesitate to share it. I am extremely curious to know!
+
+I write monthly and like to give back the knowledge I've learned. So don't hesitate to reach out; I am always available to talk about nerdy stuff 🤗! Here are my socials:
+
+- [LinkedIn](https://www.linkedin.com/in/james-jiang-87306b155/)
+- [Twitter](https://twitter.com/jamesjg_)
+- [Reddit](https://www.reddit.com/user/lovindata/)
+
+Otherwise, let's learn together in the next story 🫡! Bye ❤️.
