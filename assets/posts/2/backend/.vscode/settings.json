@@ -1,0 +1,23 @@
+{
+  // General
+  "editor.formatOnSave": true,
+
+  // Git
+  "git.autofetch": "all",
+  "git.autofetchPeriod": 180,
+  "git.pruneOnFetch": true,
+
+  // Json
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Scala
+  "[scala]": {
+    "editor.defaultFormatter": "scalameta.metals"
+  },
+  "metals.javaHome": "D:\\Application\\Java\\jdk-17.0.11+9\\bin" // Put your JDK "bin" path here!
+}

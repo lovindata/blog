@@ -1,0 +1,18 @@
+# Backend
+/backend/**/.bloop/
+/backend/.metals/
+/backend/.vscode/
+/backend/**/target/
+/backend/**/metals.sbt
+/backend/src/test/
+/backend/.gitignore
+/backend/.scalafmt.conf
+/backend/README.md
+
+# Frontend
+/frontend/.vscode
+/frontend/dist/
+/frontend/node_modules/
+/frontend/.eslintrc.cjs
+/frontend/.gitignore
+/frontend/README.md

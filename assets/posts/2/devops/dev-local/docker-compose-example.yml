@@ -1,0 +1,12 @@
+services:
+  tarp:
+    image: lovindata/tarp:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - TARP_POSTGRES_IP=host.docker.internal
+      - TARP_POSTGRES_PORT=5432
+      - TARP_POSTGRES_DB=tarp
+      - TARP_POSTGRES_USER=tarp
+      - TARP_POSTGRES_PASSWORD=tarp
+      - TARP_POSTGRES_SCHEMA=tarp
