@@ -18,5 +18,8 @@
   // CSS
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+
+  // Python
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin" // Set your Python virtual environment's interpreter path!
 }

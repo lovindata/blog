@@ -17,23 +17,23 @@
 
 ## Contribution
 
-Please install [Python](https://www.python.org/downloads/).
-
-Please install [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) with the official installer.
-
 Please install [VSCode](https://code.visualstudio.com/) and its extensions:
 
 - Even Better TOML
 - Prettier
 
-If you need to switch between Python interpreters:
-
-- `CTRL + SHIFT + P`
-- `Python: Select Interpreter`
-
-To have your Python environment inside your project (optional):
+Please install [Python](https://www.python.org/downloads/), [pip](https://pip.pypa.io/en/stable/installation/) and [venv](https://docs.python.org/3/library/venv.html).
 
 ```bash
+sudo apt install python3 python3-pip python3-venv
+```
+
+Please install [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) with the official installer.
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+echo -e '\nexport PATH="/home/lovindata/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 poetry config virtualenvs.in-project true
 ```
 
@@ -52,7 +52,7 @@ poetry update
 To clear poetry cache:
 
 ```bash
-poetry cache clear --all .
+poetry cache clear --all --quiet .
 ```
 
 To serve the blog, run the command:
