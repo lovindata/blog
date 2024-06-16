@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -5,32 +6,13 @@ metadata:
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: spark-sa-role
-rules:
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["list", "get", "watch", "create", "deletecollection"]
-  - apiGroups: [""]
-    resources: ["services"]
-    verbs: ["create", "deletecollection"]
-  - apiGroups: [""]
-    resources: ["configmaps"]
-    verbs: ["create", "deletecollection"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
-    verbs: ["list", "deletecollection"]
-
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: spark-sa-rolebinding
+  name: spark-sa
 subjects:
   - kind: ServiceAccount
     name: spark-sa
 roleRef:
   kind: Role
-  name: spark-sa-role
+  name: namespace-admin
   apiGroup: rbac.authorization.k8s.io
