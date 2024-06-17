@@ -7,6 +7,9 @@
       "path": "devops-spark-operator"
     },
     {
+      "path": "docs"
+    },
+    {
       "path": "../../.."
     }
   ]
