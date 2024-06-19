@@ -62,8 +62,8 @@ Create namespace with quota, admin role and group.
 
 ```bash
 # Create namespace with quota
-kubectl create ns company-project-dev
-kubectl config set-context docker-desktop --namespace=company-project-dev
+kubectl create ns compordept-project-env # Create the namespace.
+kubectl config set-context docker-desktop --namespace=compordept-project-env # Switch to the namespace.
 echo '
 ---
 apiVersion: v1
@@ -138,16 +138,16 @@ Create K8S certificate for a user of the group namespace-admin.
 
 ```bash
 # Generate CSR (on user side)
-openssl genrsa -out company-project-dev-admin.key 2048
-openssl req -new -key company-project-dev-admin.key -out company-project-dev-admin.csr -subj "/CN=namespace-admin/O=namespace-admin"
+openssl genrsa -out compordept-project-env-admin.key 2048
+openssl req -new -key compordept-project-env-admin.key -out compordept-project-env-admin.csr -subj "/CN=namespace-admin/O=namespace-admin"
 
 # Validate CSR & Generate CRT (on K8S admin side)
-cat company-project-dev-admin.csr | base64 | tr -d "\n" | xargs -I {} echo '
+cat compordept-project-env-admin.csr | base64 | tr -d "\n" | xargs -I {} echo '
 ---
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
-  name: company-project-dev-admin
+  name: compordept-project-env-admin
 spec:
   request: {}
   signerName: kubernetes.io/kube-apiserver-client
@@ -155,22 +155,22 @@ spec:
   usages:
     - client auth
 ' | kubectl apply -f -
-kubectl certificate approve company-project-dev-admin
-kubectl get csr company-project-dev-admin -o jsonpath='{.status.certificate}'| base64 -d > company-project-dev-admin.crt # Certificate to give to your user
+kubectl certificate approve compordept-project-env-admin
+kubectl get csr compordept-project-env-admin -o jsonpath='{.status.certificate}'| base64 -d > compordept-project-env-admin.crt # Certificate to give to your user
 
 # Set CRT and use created user (on user side)
-kubectl config set-credentials company-project-dev-admin --client-key=company-project-dev-admin.key --client-certificate=company-project-dev-admin.crt --embed-certs=true
-kubectl config set-context docker-desktop --user=company-project-dev-admin
-rm company-project-dev-admin.* # Purge certificates from disk
+kubectl config set-credentials compordept-project-env-admin --client-key=compordept-project-env-admin.key --client-certificate=compordept-project-env-admin.crt --embed-certs=true
+kubectl config set-context docker-desktop --user=compordept-project-env-admin
+rm compordept-project-env-admin.* # Purge certificates from disk
 ```
 
 Purge namespace.
 
 ```bash
-kubectl config set-context docker-desktop --user=docker-desktop
-kubectl config set-context docker-desktop --namespace=default
-kubectl delete csr company-project-dev-admin
-kubectl delete ns company-project-dev
+kubectl config set-context docker-desktop --user=docker-desktop # Set back to the K8s admin user
+kubectl config set-context docker-desktop --namespace=default # Set back to the default namespace
+kubectl delete csr compordept-project-env-admin
+kubectl delete ns compordept-project-env
 ```
 
 ### Commands for Spark
@@ -178,26 +178,26 @@ kubectl delete ns company-project-dev
 To install Spark service account on a given namespace.
 
 ```bash
-helm install devops-spark . -n company-project-dev
+helm install devops-spark . -n compordept-project-env
 helm list
 ```
 
 To submit a Spark application.
 
 ```bash
-spark-submit --master k8s://https://kubernetes.docker.internal:6443 --deploy-mode cluster --name spark-app --class org.apache.spark.examples.SparkPi --conf spark.kubernetes.driver.request.cores=50m --conf spark.kubernetes.executor.request.cores=200m --conf spark.driver.memory=512m --conf spark.executor.memory=512m --conf spark.executor.instances=1 --conf spark.kubernetes.container.image=spark:3.5.1-scala2.12-java17-ubuntu --conf spark.kubernetes.namespace=company-project-dev --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark-sa local:///opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar 1
+spark-submit --master k8s://https://kubernetes.docker.internal:6443 --deploy-mode cluster --name spark-app --class org.apache.spark.examples.SparkPi --conf spark.kubernetes.driver.request.cores=50m --conf spark.kubernetes.executor.request.cores=200m --conf spark.driver.memory=512m --conf spark.executor.memory=512m --conf spark.executor.instances=1 --conf spark.kubernetes.container.image=spark:3.5.1-scala2.12-java17-ubuntu --conf spark.kubernetes.namespace=compordept-project-env --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark-sa local:///opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar 1
 ```
 
 To kill all Spark applications.
 
 ```bash
-spark-submit --kill company-project-dev:spark-app* --master k8s://https://kubernetes.docker.internal:6443
+spark-submit --kill compordept-project-env:spark-app* --master k8s://https://kubernetes.docker.internal:6443
 kubectl get pods
 ```
 
 To uninstall Spark service account.
 
 ```bash
-helm uninstall devops-spark -n company-project-dev
+helm uninstall devops-spark -n compordept-project-env
 helm list
 ```
