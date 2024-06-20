@@ -223,7 +223,128 @@ Congratulations! 🎉 You know how to set up and manage a multi-tenant K8s clust
 
 ### Installation
 
+Three prerequisites are needed to be able to launch Spark on K8s using the `spark-submit` command.
+
+- 🗝️ K8s credentials setup on the machine: Already done previously 😇!
+- ⚡ Spark installed on the machine executing the command
+- 🔧 A dedicated K8s **[service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) for the Spark driver pod**: This is necessary because it's the [Spark driver pod who creates Spark executors and monitors them](https://spark.apache.org/docs/latest/running-on-kubernetes.html#how-it-works), manages necessary [services](https://kubernetes.io/docs/concepts/services-networking/service/), manages necessary [configmaps](https://kubernetes.io/docs/concepts/configuration/configmap/) and claims or releases [volumes](https://kubernetes.io/docs/concepts/storage/volumes/).
+
+To install Spark, here are the two necessary commands.
+
+- Install [Java 17](https://adoptium.net/marketplace/?version=17) first using [Coursier](https://get-coursier.io/docs/cli-install)
+
+```bash
+curl -fL "https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux.gz" | gzip -d > cs
+chmod +x cs
+./cs setup -y --jvm 17
+rm cs
+source ~/.profile
+java --version
+```
+
+- Install [Spark](https://spark.apache.org/downloads.html)
+
+```bash
+mkdir -p ~/apps/spark
+curl -fLo ~/apps/spark/spark-3.5.1-bin-hadoop3-scala2.13.tgz https://dlcdn.apache.org/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3-scala2.13.tgz
+tar -xf ~/apps/spark/spark-3.5.1-bin-hadoop3-scala2.13.tgz -C ~/apps/spark
+rm ~/apps/spark/spark-3.5.1-bin-hadoop3-scala2.13.tgz
+echo -e '\nexport PATH="~/apps/spark/spark-3.5.1-bin-hadoop3-scala2.13/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+spark-submit --version
+```
+
+Then you can install the Spark service account bound to `namespace-admin` role. This part assumes the isolated namespace is properly set up.
+
+```bash
+echo '
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark
+subjects:
+  - kind: ServiceAccount
+    name: spark
+roleRef:
+  kind: Role
+  name: namespace-admin
+  apiGroup: rbac.authorization.k8s.io
+' | kubectl apply -f -
+```
+
+You can list service accounts to check if Spark's is correctly installed or not.
+
+```bash
+kubectl get sa
+```
+
+You can delete the service account with the following command.
+
+```bash
+echo '
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark
+subjects:
+  - kind: ServiceAccount
+    name: spark
+roleRef:
+  kind: Role
+  name: namespace-admin
+  apiGroup: rbac.authorization.k8s.io
+' | kubectl delete -f -
+```
+
+Let's go to the next part! Submitting a Spark job! 😃
+
 ### Submitting a Spark job
+
+The goal is to use the provided Spark application with the installation: ["SparkPi"](https://github.com/apache/spark/blob/master/examples/src/main/scala/org/apache/spark/examples/SparkPi.scala). By default, when building your own Spark application, you should build a custom Docker image following the [official guide](https://spark.apache.org/docs/latest/running-on-kubernetes.html#docker-images). It is also possible to use the [Spark official Docker image on DockerHub](https://hub.docker.com/layers/library/spark/3.5.1-scala2.12-java17-ubuntu/images/sha256-682c0707d195b3a8fbc0a888ea91aaea9e4befc8de566aa4625445a430ab55a2?context=explore) as a base to inject your custom Spark application JAR. In our case, the Spark official Docker image already includes the "SparkPi" application at '/opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar', so we are going to use that directly.
+
+This part is going to be short because all the prerequisites are already done. It's now just a matter of launching the following command 😎.
+
+```bash
+spark-submit --master k8s://https://kubernetes.docker.internal:6443 --deploy-mode cluster --name spark-app --class org.apache.spark.examples.SparkPi --conf spark.kubernetes.driver.request.cores=50m --conf spark.kubernetes.executor.request.cores=200m --conf spark.driver.memory=512m --conf spark.executor.memory=512m --conf spark.executor.instances=1 --conf spark.kubernetes.container.image=spark:3.5.1-scala2.12-java17-ubuntu --conf spark.kubernetes.namespace=compordept-project-env --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark local:///opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar 1
+```
+
+You can open a second terminal to watch the Spark pods in action héhé 🤩.
+
+```bash
+kubectl get po -w
+```
+
+If you take a look at the driver pod logs, you should see the Pi estimate.
+
+```bash
+kubectl logs spark-app-4ac4bd9034099a45-driver
+```
+
+```bash
+Pi is roughly 3.139351393513935
+```
+
+The command to kill Spark driver pods if necessary.
+
+```bash
+spark-submit --kill compordept-project-env:spark-app* --master k8s://https://kubernetes.docker.internal:6443
+```
+
+Congratulations! You are now capable of running **Spark on K8s and all without K8s cluster-level access, just namespace-level access** is enough 👍! It also means it's extremely easy to uninstall the project from the K8s cluster, just a matter of `kubectl delete ns compordept-project-env` 😉. But, it requires installing Spark on the machine executing the command as you can see.
 
 ## 🔧 Spark on K8s via Kubeflow
 
