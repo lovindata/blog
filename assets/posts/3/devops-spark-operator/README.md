@@ -38,8 +38,8 @@ helm dependency update
 To install Spark operator on a given namespace.
 
 ```bash
-helm install devops-spark-operator . -n company-project-dev --create-namespace
-kubectl config set-context docker-desktop --namespace=company-project-dev
+helm install devops-spark-operator . -n compordept-project-env --create-namespace
+kubectl config set-context docker-desktop --namespace=compordept-project-env
 helm list
 kubectl get ns
 ```
@@ -86,9 +86,9 @@ kubectl delete sparkapp --all
 To uninstall Spark operator.
 
 ```bash
-helm uninstall devops-spark-operator -n company-project-dev
+helm uninstall devops-spark-operator -n compordept-project-env
 kubectl config set-context docker-desktop --namespace=default
-kubectl delete namespace company-project-dev
+kubectl delete namespace compordept-project-env
 kubectl delete crds scheduledsparkapplications.sparkoperator.k8s.io sparkapplications.sparkoperator.k8s.io
 helm list
 kubectl get ns

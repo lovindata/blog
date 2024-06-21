@@ -202,6 +202,73 @@ This role can be viewed using:
 kubectl describe role namespace-admin
 ```
 
+```bash
+Name:         namespace-admin
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources                          Non-Resource URLs  Resource Names  Verbs
+  ---------                          -----------------  --------------  -----
+  bindings.*                         []                 []              [*]
+  configmaps.*                       []                 []              [*]
+  controllerrevisions.*              []                 []              [*]
+  cronjobs.*/status                  []                 []              [*]
+  cronjobs.*                         []                 []              [*]
+  csistoragecapacities.*             []                 []              [*]
+  daemonsets.*/status                []                 []              [*]
+  daemonsets.*                       []                 []              [*]
+  deployments.*/scale                []                 []              [*]
+  deployments.*/status               []                 []              [*]
+  deployments.*                      []                 []              [*]
+  endpoints.*                        []                 []              [*]
+  endpointslices.*                   []                 []              [*]
+  events.*                           []                 []              [*]
+  horizontalpodautoscalers.*/status  []                 []              [*]
+  horizontalpodautoscalers.*         []                 []              [*]
+  ingresses.*/status                 []                 []              [*]
+  ingresses.*                        []                 []              [*]
+  jobs.*/status                      []                 []              [*]
+  jobs.*                             []                 []              [*]
+  leases.*                           []                 []              [*]
+  limitranges.*                      []                 []              [*]
+  localsubjectaccessreviews.*        []                 []              [*]
+  networkpolicies.*                  []                 []              [*]
+  persistentvolumeclaims.*/status    []                 []              [*]
+  persistentvolumeclaims.*           []                 []              [*]
+  poddisruptionbudgets.*/status      []                 []              [*]
+  poddisruptionbudgets.*             []                 []              [*]
+  pods.*/attach                      []                 []              [*]
+  pods.*/binding                     []                 []              [*]
+  pods.*/ephemeralcontainers         []                 []              [*]
+  pods.*/eviction                    []                 []              [*]
+  pods.*/exec                        []                 []              [*]
+  pods.*/log                         []                 []              [*]
+  pods.*/portforward                 []                 []              [*]
+  pods.*/proxy                       []                 []              [*]
+  pods.*/status                      []                 []              [*]
+  pods.*                             []                 []              [*]
+  podtemplates.*                     []                 []              [*]
+  replicasets.*/scale                []                 []              [*]
+  replicasets.*/status               []                 []              [*]
+  replicasets.*                      []                 []              [*]
+  replicationcontrollers.*/scale     []                 []              [*]
+  replicationcontrollers.*/status    []                 []              [*]
+  replicationcontrollers.*           []                 []              [*]
+  resourcequotas.*/status            []                 []              [*]
+  rolebindings.*                     []                 []              [*]
+  secrets.*                          []                 []              [*]
+  serviceaccounts.*/token            []                 []              [*]
+  serviceaccounts.*                  []                 []              [*]
+  services.*/proxy                   []                 []              [*]
+  services.*/status                  []                 []              [*]
+  services.*                         []                 []              [*]
+  statefulsets.*/scale               []                 []              [*]
+  statefulsets.*/status              []                 []              [*]
+  statefulsets.*                     []                 []              [*]
+  resourcequotas.*                   []                 []              [get list watch]
+  roles.*                            []                 []              [get list watch]
+```
+
 This command should give you a "forbidden access" error.
 
 ```bash
@@ -220,6 +287,15 @@ kubectl delete ns compordept-project-env
 Congratulations! 🎉 You know how to set up and manage a multi-tenant K8s cluster organized by namespaces!
 
 ## 💻 Spark on K8s via CLI
+
+In this part, we are going to install Spark and launch `spark-submit` directly on the previously set up K8s namespace!
+
+<figure markdown="span">
+  ![Spark on K8s via CLI](image-3.png)
+  <figcaption>Spark on K8s via CLI</figcaption>
+</figure>
+
+Let's get to work!
 
 ### Installation
 
@@ -348,7 +424,142 @@ Congratulations! You are now capable of running **Spark on K8s and all without K
 
 ## 🔧 Spark on K8s via Kubeflow
 
+First, let's clean up some leftovers from the previous part.
+
+```bash
+spark-submit --kill compordept-project-env:spark-app* --master k8s://https://kubernetes.docker.internal:6443
+echo '
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark
+subjects:
+  - kind: ServiceAccount
+    name: spark
+roleRef:
+  kind: Role
+  name: namespace-admin
+  apiGroup: rbac.authorization.k8s.io
+' | kubectl delete -f -
+```
+
+In this part, we are going to show that the Kubeflow Spark operator is not compatible with our previously set-up isolated namespace. Then, we will revert to cluster-level access, install the Kubeflow Spark operator, and launch the same 'SparkPi' application.
+
+<figure markdown="span">
+  ![Spark on K8s via Kubeflow](image-3.png)
+  <figcaption>Spark on K8s via Kubeflow</figcaption>
+</figure>
+
+Let's go!
+
 ### Installation
+
+Here are the steps to install Kubeflow Spark operator:
+
+- Install [Helm](https://helm.sh/docs/intro/install/): Kubeflow Spark operator is available via a Helm chart, which is why the Helm CLI is necessary.
+- Ensure you have **necessary Kubernetes cluster-level access**: Kubeflow Spark operator installs CRDs and ClusterRoles, which require cluster-level access.
+- [Add the Kubeflow Spark operator repository locally and install it on the Kubernetes cluster](https://github.com/kubeflow/spark-operator/blob/master/charts/spark-operator-chart/README.md)
+
+Let's make Kubeflow Spark operator work!
+
+Here is the command to install Helm.
+
+```bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+rm ./get_helm.sh
+```
+
+You can confirm the installation with the following command:
+
+```bash
+helm version
+```
+
+```bash
+version.BuildInfo{Version:"v3.15.1", GitCommit:"e211f2aa62992bd72586b395de50979e31231829", GitTreeState:"clean", GoVersion:"go1.22.3"}
+```
+
+If it worked, Helm is perfectly installed 😁!
+
+Next, we have necessary Kubernetes cluster-level access, but let's skip this part for now. Remember, we are currently set with namespace-level access using `namespace-admin` role. So, let's try installing Kubeflow Spark operator without cluster-level access.
+
+```bash
+helm repo add spark-operator https://kubeflow.github.io/spark-operator
+helm install devops-spark-operator spark-operator/spark-operator --version 1.4.0 -n compordept-project-env
+```
+
+You should receive the following "Forbidden" access error.
+
+```bash
+Error: INSTALLATION FAILED: failed to install CRD crds/sparkoperator.k8s.io_scheduledsparkapplications.yaml: 1 error occurred:
+        * customresourcedefinitions.apiextensions.k8s.io is forbidden: User "namespace-admin" cannot create resource "customresourcedefinitions" in API group "apiextensions.k8s.io" at the cluster scope
+```
+
+As you can see, it's not possible to use Spark via Kubeflow Spark Operator without Kubernetes cluster-level access! Let's switch back to our Kubernetes admin user.
+
+```bash
+kubectl config set-context docker-desktop --user=docker-desktop # Set back to the K8s admin user
+```
+
+Now let's try again.
+
+```bash
+helm install devops-spark-operator spark-operator/spark-operator --version 1.4.0 -n compordept-project-env
+```
+
+```bash
+NAME: devops-spark-operator
+LAST DEPLOYED: Fri Jun 21 07:48:49 2024
+NAMESPACE: compordept-project-env
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+```
+
+Ok, it seems it has worked now. But if you look at the pods, the `spark-operator` pod is missing.
+
+```bash
+kubectl get po
+```
+
+```bash
+No resources found in compordept-project-env namespace.
+```
+
+This is due to the `ResourceQuota` in place, which requires requests and limits to be set up on all pods in order to orchestrate them. I did not find a way to configure them during helm chart installation. So let's just remove the quota:
+
+```bash
+kubectl delete quota namespace-quota
+```
+
+Then try to reinstall the chart.
+
+```bash
+helm uninstall devops-spark-operator -n compordept-project-env
+helm install devops-spark-operator spark-operator/spark-operator --version 1.4.0 -n compordept-project-env
+```
+
+Then list the pods.
+
+```bash
+kubectl get po
+```
+
+```bash
+NAME                                     READY   STATUS    RESTARTS   AGE
+devops-spark-operator-76968c6d75-nn4l7   1/1     Running   0          84s
+```
+
+Wow, this time it actually worked 👍! Installation complete! Let's proceed to submitting Spark applications now.
 
 ### Submitting a Spark job
 
