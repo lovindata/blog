@@ -1,13 +1,13 @@
 ---
 title: "Mastering Spark on K8s 🔥 and Why I Dumped 💔 Kubeflow Spark Operator (Formerly Google's Spark Operator)!"
-date: 2024-07-06
+date: 2024-06-22
 categories:
   - Kubernetes
   - Data Engineering
   - DevOps
 ---
 
-Heyoooo [Spark ⚡](https://spark.apache.org/) developers! My product manager a few months ago asked me one question: "Is it possible to run Spark applications without [K8s 🐳](https://kubernetes.io/) cluster-level access?" At the time, I only knew the [Kubeflow 🔧 Spark Operator](https://github.com/kubeflow/spark-operator) well and was using it for deploying all my Spark applications. For those who know, you must have K8s cluster-level access to use the Kubeflow Spark Operator. The reasons are because it installs [CRDs](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#customresourcedefinitions) and [ClusterRole](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole). So I told him "no" with these reasons, and on his side, he tried his best to convince the prospect with the constraint in mind. At the enterprise level, they usually have a [multi-tenant K8s cluster](https://kubernetes.io/docs/concepts/security/multi-tenancy/) segregated by company/department, project, and environment (dev, uat, pre-prod, or prod) using [Namespaces](https://kubernetes.io/docs/concepts/security/multi-tenancy/#namespaces). This way, they make the most of the computing resources allocated. Plus, if one project does not meet the expectation or the contract ends, hop hop `kubectl delete <compordept>-<project>-<env>` and it's like the project has never existed. I am currently writing to tell my product manager, "Yes, it's possible to run Spark applications without K8s cluster-level access."! Here is how! 🚀
+Heyoooo [Spark ⚡](https://spark.apache.org/) developers! My product manager several months ago asked me one question: "Is it possible to run Spark applications without [K8s 🐳](https://kubernetes.io/) cluster-level access?" At the time, I only knew the [Kubeflow 🔧 Spark Operator](https://github.com/kubeflow/spark-operator) well and was using it for deploying all my Spark applications. For those who know, you must have K8s cluster-level access to use the Kubeflow Spark Operator. The reasons are because it installs [CRDs](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#customresourcedefinitions) and [ClusterRole](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole). So I told him "no" with these reasons, and on his side, he tried his best to convince the prospect with the constraint in mind. At the enterprise level, they usually have a [multi-tenant K8s cluster](https://kubernetes.io/docs/concepts/security/multi-tenancy/) segregated by company/department, project, and environment (dev, uat, pre-prod, or prod) using [Namespaces](https://kubernetes.io/docs/concepts/security/multi-tenancy/#namespaces). This way, they make the most of the computing resources allocated. Plus, if one project does not meet the expectation or the contract ends, hop hop `kubectl delete <compordept>-<project>-<env>` and it's like the project has never existed. I am currently writing to tell my product manager, "Yes, it's possible to run Spark applications without K8s cluster-level access."! Here is how! 🚀
 
 <!-- more -->
 
@@ -69,9 +69,9 @@ Nice! 🎉 You've successfully installed Kubernetes.
 
 The goal now is to set up isolated namespaces to simulate an enterprise multi-tenant Kubernetes cluster. To set up an isolated namespace, here are the essentials:
 
-- **A namespace under quota**: Kubernetes resources are not unlimited. The relevant resources to limit are CPU, RAM, ephemeral storage, number of pods, and other resources as necessary.
-- **An admin namespace role**: Users must be restricted to a namespace, but within this namespace, Kubernetes admins should provide all necessary access for them to operate autonomously. However, they should not have permission to create, update, or delete quotas and roles.
-- **Expirable access**: Projects do not last indefinitely, so access should not be permanent either.
+- **📦🌐 A namespace under quota**: Kubernetes resources are not unlimited. The relevant resources to limit are CPU, RAM, ephemeral storage, number of pods, and other resources as necessary.
+- **👩‍💻🌐 An admin namespace role**: Users must be restricted to a namespace, but within this namespace, Kubernetes admins should provide all necessary access for them to operate autonomously. However, they should not have permission to create, update, or delete quotas and roles.
+- **🔄🌐 Expirable access**: Projects do not last indefinitely, so access should not be permanent either.
 
 Let's get to work!
 
@@ -364,26 +364,8 @@ kubectl get sa
 You can delete the service account with the following command.
 
 ```bash
-echo '
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: spark
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: spark
-subjects:
-  - kind: ServiceAccount
-    name: spark
-roleRef:
-  kind: Role
-  name: namespace-admin
-  apiGroup: rbac.authorization.k8s.io
-' | kubectl delete -f -
+kubectl delete rolebinding spark
+kubectl delete sa spark
 ```
 
 Let's go to the next part! Submitting a Spark job! 😃
@@ -428,32 +410,14 @@ First, let's clean up some leftovers from the previous part.
 
 ```bash
 spark-submit --kill compordept-project-env:spark-app* --master k8s://https://kubernetes.docker.internal:6443
-echo '
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: spark
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: spark
-subjects:
-  - kind: ServiceAccount
-    name: spark
-roleRef:
-  kind: Role
-  name: namespace-admin
-  apiGroup: rbac.authorization.k8s.io
-' | kubectl delete -f -
+kubectl delete rolebinding spark
+kubectl delete sa spark
 ```
 
-In this part, we are going to show that the Kubeflow Spark operator is not compatible with our previously set-up isolated namespace. Then, we will revert to cluster-level access, install the Kubeflow Spark operator, and launch the same 'SparkPi' application.
+In this part, we are going to show that the **Kubeflow Spark operator is not compatible with our previously set-up isolated namespace**. Then, we will revert to cluster-level access, install the Kubeflow Spark operator, and launch the same 'SparkPi' application.
 
 <figure markdown="span">
-  ![Spark on K8s via Kubeflow](image-3.png)
+  ![Spark on K8s via Kubeflow](image-4.png)
   <figcaption>Spark on K8s via Kubeflow</figcaption>
 </figure>
 
@@ -463,9 +427,9 @@ Let's go!
 
 Here are the steps to install Kubeflow Spark operator:
 
-- Install [Helm](https://helm.sh/docs/intro/install/): Kubeflow Spark operator is available via a Helm chart, which is why the Helm CLI is necessary.
-- Ensure you have **necessary Kubernetes cluster-level access**: Kubeflow Spark operator installs CRDs and ClusterRoles, which require cluster-level access.
-- [Add the Kubeflow Spark operator repository locally and install it on the Kubernetes cluster](https://github.com/kubeflow/spark-operator/blob/master/charts/spark-operator-chart/README.md)
+- ⬇️🛠️ Install [Helm](https://helm.sh/docs/intro/install/): Kubeflow Spark operator is available via a Helm chart, which is why the Helm CLI is necessary.
+- 🔑🌐 Ensure you have **necessary Kubernetes cluster-level access**: Kubeflow Spark operator installs CRDs and ClusterRoles, which require cluster-level access.
+- 🔧🌐 Add the [Kubeflow Spark operator repository](https://github.com/kubeflow/spark-operator/blob/master/charts/spark-operator-chart/README.md) locally and install it on the Kubernetes cluster
 
 Let's make Kubeflow Spark operator work!
 
@@ -490,24 +454,28 @@ version.BuildInfo{Version:"v3.15.1", GitCommit:"e211f2aa62992bd72586b395de50979e
 
 If it worked, Helm is perfectly installed 😁!
 
-Next, we have necessary Kubernetes cluster-level access, but let's skip this part for now. Remember, we are currently set with namespace-level access using `namespace-admin` role. So, let's try installing Kubeflow Spark operator without cluster-level access.
+Next, we have the necessary Kubernetes cluster-level access, but let's skip this part for now. Remember, we are currently set with namespace-level access using the `namespace-admin` role. So, let's try installing the Kubeflow Spark operator without cluster-level access.
 
 ```bash
 helm repo add spark-operator https://kubeflow.github.io/spark-operator
 helm install devops-spark-operator spark-operator/spark-operator --version 1.4.0 -n compordept-project-env
 ```
 
-You should receive the following "Forbidden" access error.
+You should receive the following 'Forbidden' access error.
 
 ```bash
 Error: INSTALLATION FAILED: failed to install CRD crds/sparkoperator.k8s.io_scheduledsparkapplications.yaml: 1 error occurred:
         * customresourcedefinitions.apiextensions.k8s.io is forbidden: User "namespace-admin" cannot create resource "customresourcedefinitions" in API group "apiextensions.k8s.io" at the cluster scope
 ```
 
-As you can see, it's not possible to use Spark via Kubeflow Spark Operator without Kubernetes cluster-level access! Let's switch back to our Kubernetes admin user.
+As you can see, it's **not possible to use Spark via Kubeflow Spark Operator without Kubernetes cluster-level access!** Let's switch back to our Kubernetes admin user.
 
 ```bash
 kubectl config set-context docker-desktop --user=docker-desktop # Set back to the K8s admin user
+kubectl config delete-user compordept-project-env-admin
+kubectl delete rolebinding namespace-admin
+kubectl delete role namespace-admin
+kubectl delete csr compordept-project-env-admin
 ```
 
 Now let's try again.
@@ -525,7 +493,7 @@ REVISION: 1
 TEST SUITE: None
 ```
 
-Ok, it seems it has worked now. But if you look at the pods, the `spark-operator` pod is missing.
+Ok, it seems it has worked now. But if you look at the pods, the Kubeflow Spark operator pod is missing.
 
 ```bash
 kubectl get po
@@ -535,20 +503,20 @@ kubectl get po
 No resources found in compordept-project-env namespace.
 ```
 
-This is due to the `ResourceQuota` in place, which requires requests and limits to be set up on all pods in order to orchestrate them. I did not find a way to configure them during helm chart installation. So let's just remove the quota:
+This is due to the `ResourceQuota` in place, which requires requests and limits to be set up on all pods in order to orchestrate them. I did not find a way to configure them during Helm chart installation. So let's just remove the quota:
 
 ```bash
 kubectl delete quota namespace-quota
 ```
 
-Then try to reinstall the chart.
+Then, try to reinstall the chart.
 
 ```bash
 helm uninstall devops-spark-operator -n compordept-project-env
 helm install devops-spark-operator spark-operator/spark-operator --version 1.4.0 -n compordept-project-env
 ```
 
-Then list the pods.
+Then, list the pods.
 
 ```bash
 kubectl get po
@@ -559,10 +527,103 @@ NAME                                     READY   STATUS    RESTARTS   AGE
 devops-spark-operator-76968c6d75-nn4l7   1/1     Running   0          84s
 ```
 
-Wow, this time it actually worked 👍! Installation complete! Let's proceed to submitting Spark applications now.
+Wow, this time it actually worked 👍! Installation complete!
+
+Here are some commands if you would like to delete the created resources.
+
+```bash
+helm uninstall devops-spark-operator -n compordept-project-env
+kubectl delete crds scheduledsparkapplications.sparkoperator.k8s.io sparkapplications.sparkoperator.k8s.io
+```
+
+Let's proceed to submitting Spark applications now.
 
 ### Submitting a Spark job
 
+To launch a Spark job, here are the steps:
+
+- 📄⚙️ **Define a K8s manifest YAML file** using the resource `SparkApplication`. This resource is not native to K8s; it comes from the Kubeflow Spark Operator CRDs.
+- 📄🚀 Then, just **apply the K8s file**.
+
+Let's use the official Spark Docker image that comes with the "SparkPi" application, like when we were running Spark via CLI.
+
+```bash
+echo "
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: spark-app
+spec:
+  type: Scala
+  mode: cluster
+  image: "spark:3.5.1"
+  imagePullPolicy: Always
+  mainClass: org.apache.spark.examples.SparkPi
+  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.12-3.5.1.jar"
+  sparkVersion: "3.5.1"
+  restartPolicy:
+    type: Never
+  driver:
+    cores: 1
+    memory: "512m"
+    labels:
+      version: 3.5.1
+    serviceAccount: devops-spark-operator-spark
+  executor:
+    cores: 1
+    instances: 1
+    memory: "512m"
+    labels:
+      version: 3.5.1
+" | kubectl apply -f -
+```
+
+If you pay attention, in terms of driver and executor core requests, it's not exactly the same as the previous Spark submit via Spark CLI. Previously, '50m' and '200m' were set. This is because the `SparkApplication` resource does not support millicore units.
+
+The `SparkApplication` resource, like any other K8s resource, can be listed.
+
+```bash
+kubectl get sparkapp
+```
+
+```bash
+NAME        STATUS      ATTEMPTS   START                  FINISH       AGE
+spark-app   SUBMITTED   1          2024-06-22T07:27:38Z   <no value>   8s
+```
+
+If you list the pods, you will see your Spark application running!
+
+```bash
+kubectl get pod
+```
+
+```bash
+NAME                                     READY   STATUS              RESTARTS      AGE
+devops-spark-operator-76968c6d75-nn4l7   1/1     Running             2 (57m ago)   25h
+spark-app-driver                         1/1     Running             0             35s
+spark-pi-5672d5903ed86ce8-exec-1         0/1     ContainerCreating   0             1s
+```
+
+And you can get your estimated Pi just like for the Spark via CLI.
+
+```bash
+kubectl logs spark-app-driver
+```
+
+```bash
+Pi is roughly 3.1459357296786483
+```
+
+The following command deletes `SparkApplication` resources and their related pods.
+
+```bash
+kubectl delete sparkapp spark-app
+```
+
+Congratulations! You know how to launch a Spark job using the Kubeflow Spark operator! The advantage of using the Kubeflow Spark operator instead of the default Spark via CLI is not needing to set up Spark locally or install Java and Spark. Plus, the Kubeflow Spark operator offers other features like cron scheduling and the `sparkctl` command-line tool.
+
 ## 🔚 Conclusion
+
+I think you don't need the Kubeflow Spark operator. The basic Spark via CLI for running jobs on Kubernetes is best, even if you have cluster-level access to install the Kubeflow Spark operator. This way, it enforces data engineers to work with tight namespace-level access on K8s, which is often the case in the industry.
 
 I write monthly on the [LovinData Blog](https://lovindata.github.io/blog/) and on [Medium](https://medium.com/@jamesjg), and like to give back the knowledge I've learned. So don't hesitate to reach out; I'm always available to chat about nerdy stuff 🤗! Here are my socials: [LinkedIn](https://www.linkedin.com/in/james-jiang-87306b155/), [Twitter](https://twitter.com/jamesjg_) and [Reddit](https://www.reddit.com/user/lovindata/). Otherwise, let's learn together in the next story 🫡! Bye ❤️.

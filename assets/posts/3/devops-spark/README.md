@@ -164,10 +164,11 @@ kubectl config set-context docker-desktop --user=compordept-project-env-admin
 rm compordept-project-env-admin.* # Purge certificates from disk
 ```
 
-Purge namespace.
+Purge namespace and the created user.
 
 ```bash
 kubectl config set-context docker-desktop --user=docker-desktop # Set back to the K8s admin user
+kubectl config delete-user compordept-project-env-admin
 kubectl config set-context docker-desktop --namespace=default # Set back to the default namespace
 kubectl delete csr compordept-project-env-admin
 kubectl delete ns compordept-project-env
