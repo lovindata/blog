@@ -1,0 +1,5 @@
+# https://github.com/kubeflow/spark-operator/blob/master/charts/spark-operator-chart/README.md#values
+spark-operator:
+  serviceAccounts:
+    spark:
+      name: "spark-sa"

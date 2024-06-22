@@ -1,0 +1,20 @@
+{
+  // General
+  "editor.formatOnSave": true,
+
+  // Json
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Helm
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[helm]": {
+    "editor.formatOnSave": false // No decent VSCode extension yet.
+  }
+}
