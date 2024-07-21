@@ -1,0 +1,7 @@
+{
+  // Scala
+  "[scala]": {
+    "editor.defaultFormatter": "scalameta.metals"
+  },
+  "metals.javaHome": "/home/lovindata/.cache/coursier/arc/https/github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.23%252B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.23_9.tar.gz/jdk-11.0.23+9/bin/java" // Put your JDK "bin" path here!
+}
