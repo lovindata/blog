@@ -27,44 +27,172 @@ What are Ubuntu Server, Docker, Portainer, and Nginx Proxy Manager? Quickly:
 
 At the end of this guide, you should be able to set up a home server environment with Ubuntu Server, Docker, Portainer, and Nginx Proxy Manager, enabling efficient management of containers and web traffic. Let's get started!
 
-## Create bootable USB key
+## 🔌 Create a Bootable USB Key
 
-- Install [Rufus](https://rufus.ie/en/)
-- Install [Ubuntu Server](https://ubuntu.com/download/server)
-- Plug your USB key
-- Open Rufus
-- Device > Choose your USB key
-- Boot selection > Choose the installed Ubuntu Server image
-- Click on Start
-- Validate pop ups and wait
+In this part, we are going to create a bootable USB key using Rufus.
 
-## Install Ubuntu Server OS
+<figure markdown="span">
+  ![Create a bootable USB key with Rufus](image-1.png)
+  <figcaption>Create a bootable USB key with Rufus</figcaption>
+</figure>
 
-- Plug the USB key
-- Turn ON the machine and open the BIOS
-- Set your the USB key as first boot priority and restart the machine
-- Try or install Ubuntu Server
-- Follow the instructions (choose default but some details)
-  - Choose the base for the installation > Ubuntu Server
-  - Network configuration to setup by cable or wifi
-  - Guided storage configuration > Use an entire disk + Set up this disk as an LVM group
-  - Storage configuration > ubuntu-lv > Edit > Size (max "???") > Set it to the max "???" > Save > Done
-  - SSH configuration > Install OpenSSH server > Yes
-  - Reboot now
-  - Remove the plugged USB key and enter
-- It will reboot
-- Try to login if it worked, then you are ready!
-- Check connection via SSH
+The goal is to set up a USB drive that will allow us to easily install Ubuntu Server on a system.
 
-```bash
-# On the server machine
+Go to [rufus.ie](https://rufus.ie/en/) to download and install Rufus.
+
+<figure markdown="span">
+  ![Install Rufus](image-2.png)
+  <figcaption>Install Rufus</figcaption>
+</figure>
+
+Do the same for Ubuntu Server at [ubuntu.com/download/server](https://ubuntu.com/download/server).
+
+<figure markdown="span">
+  ![Download Ubuntu Server ISO](image-3.png)
+  <figcaption>Download Ubuntu Server ISO</figcaption>
+</figure>
+
+Now it's time to create a bootable USB key with the Ubuntu Server ISO. Plug in your USB key, open Rufus, and for `Boot selection`, select the downloaded Ubuntu Server ISO. Here’s what your configuration should look like:
+
+<figure markdown="span">
+  ![Rufus Configuration](image-4.png)
+  <figcaption>Rufus Configuration</figcaption>
+</figure>
+
+Click on `START`, and now all you have to do is wait 👍. Congratulations, you've set up a bootable USB key! Let's use it to install Ubuntu Server on our machine!
+
+## 🐧 Install Ubuntu Server OS
+
+The goal now is to use the USB key containing our Ubuntu Server ISO to install Ubuntu Server on our machine.
+
+<figure markdown="span">
+  ![Install Ubuntu Server OS](image-5.png)
+  <figcaption>Install Ubuntu Server OS</figcaption>
+</figure>
+
+The ultimate goal is to have a machine that we can connect to via [SSH](https://www.techtarget.com/searchsecurity/definition/Secure-Shell), just like one rented from any [cloud provider](https://cloud.google.com/learn/what-is-a-cloud-service-provider) 😉.
+
+Start by plugging the USB key, then turn ON the machine and open the [BIOS](https://en.wikipedia.org/wiki/BIOS). To open the BIOS, restart your PC and press the designated key (commonly F2, F12, Delete, or Esc), which depends on your PC's manufacturer.
+
+<figure markdown="span">
+  ![The USB key is set as the first boot option](image-6.png)
+  <figcaption>The USB key is set as the first boot option</figcaption>
+</figure>
+
+As explained on the screen, **the USB key is set as the first boot option**. Then restart the machine, you should be welcomed with the choice: `Try or install Ubuntu Server`.
+
+<figure markdown="span">
+  ![Try or install Ubuntu Server](image-7.png)
+  <figcaption>Try or install Ubuntu Server</figcaption>
+</figure>
+
+Select this choice, and then you will follow a series of instructions. Here are some tricky parts (obvious parts will not be detailed; regarding the few screens that will appear, I am not the original author. If you wish for a more detailed explanation, please check out [SavvyNik's video](https://www.youtube.com/watch?v=zs2zdVPwZ7E&t=753s) 👍).
+
+- Choose the basic installation.
+
+<figure markdown="span">
+  ![Choose the basic installation](image-8.png)
+  <figcaption>Choose the basic installation</figcaption>
+</figure>
+
+- Set up the internet connection via Ethernet or WiFi.
+
+<figure markdown="span">
+  ![Network connections](image-9.png)
+  <figcaption>Network connections</figcaption>
+</figure>
+
+On your side, you may have more interfaces. It can also be via WiFi 👍! The important thing is to have one set up because **internet will be needed** for **package downloads and updates**, and, of course, for the **SSH connection through the home network**.
+
+- `Use an entire disk` and `Set up this disk as LVM group`.
+
+<figure markdown="span">
+  ![Guided storage configuration](image-10.png)
+  <figcaption>Guided storage configuration</figcaption>
+</figure>
+
+- Set the storage configuration to utilize all the disk space.
+
+For the storage configuration part, by default, it does not utilize all the disk space. You can see this in the `free space` field in the `DEVICE` section:
+
+<figure markdown="span">
+  ![Storage configuration - Before](image-11.png)
+  <figcaption>Storage configuration - Before</figcaption>
+</figure>
+
+So the goal is to **allocate all this unconfigured free space to `ubuntu-lv`**. This will allow you to utilize all your disk space for your files, packages, etc.
+
+<figure markdown="span">
+  ![Storage configuration - Editing logical volumne ubuntu-lv of ubuntu-vg](image-12.png)
+  <figcaption>Storage configuration - Editing logical volumne ubuntu-lv of ubuntu-vg</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Storage configuration - After](image-13.png)
+  <figcaption>Storage configuration - After</figcaption>
+</figure>
+
+- Install OpenSSH server.
+
+<figure markdown="span">
+  ![Install OpenSSH server](image-14.png)
+  <figcaption>Install OpenSSH server</figcaption>
+</figure>
+
+- Regarding `Featured Server Snaps`, do not select anything and select `Done`; it will start installing packages, be patient, and then just click `Reboot Now`.
+
+<figure markdown="span">
+  ![Install complete!](image-15.png)
+  <figcaption>Install complete!</figcaption>
+</figure>
+
+- You can now login!
+
+Let it boot, and you should encounter an error because the USB key is still plugged in, and the server tries to boot from it. Turn off the server, **remove the USB key**, and then **boot up the server**. If you end up with the following screen, congratulations, you've **successfully installed Ubuntu Server 😍**!
+
+<figure markdown="span">
+  ![You can now login!](image-16.png)
+  <figcaption>You can now login!</figcaption>
+</figure>
+
+Final thing, let's check if we can connect to the server from another machine via SSH. First, find the server's IP by logging in and running the following command on the server:
+
+```bash title="From server"
 ip a
 ```
 
-```bash
-# On your work machine
-ssh lovindata@192.168.1.X
+It should give you a list of interfaces. Find the one that has an `inet` address formatted as `192.168.1.X`:
+
+```bash title="From server"
+...
+4: wlp4s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.69/24 metric 600 brd 192.168.1.255 scope global dynamic wlp4s0
+       valid_lft 38554sec preferred_lft 38554sec
+    inet6 xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/64 scope global dynamic mngtmpaddr noprefixroute
+       valid_lft 86165sec preferred_lft 86165sec
+    inet6 fe80::xxxx:xxxx:xxxx:xxxx/64 scope link
+       valid_lft forever preferred_lft forever
+...
 ```
+
+So in my case it looks like, it is `192.168.1.69`.
+
+```bash title="From work machine"
+ssh myuser@192.168.1.69
+```
+
+If it connects:
+
+```bash title="From work machine"
+...
+Last login: Mon Jan 13 05:49:37 2025 from 192.168.1.120
+myuser@myserver:~$
+```
+
+Then, congratulations! You've successfully set up a server similar to the ones you can rent from AWS or any other cloud provider 🤩.
+
+## Install Docker, Portainer and Nginx Proxy Manager
 
 - [Install Docker](https://docs.docker.com/engine/install/ubuntu/#installation-methods)
 
