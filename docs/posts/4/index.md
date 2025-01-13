@@ -190,21 +190,28 @@ Last login: Mon Jan 13 05:49:37 2025 from 192.168.1.120
 myuser@myserver:~$
 ```
 
-Then, congratulations! You've successfully set up a server similar to the ones you can rent from AWS or any other cloud provider 🤩.
+Then, congratulations! You've successfully set up a server similar to the ones you can rent from AWS or any other cloud provider 🤩. All the following commands will be executed from the work machine on behalf of the server via SSH from now on!
 
 ## 🐋 Set Up Docker, Portainer, and Nginx Proxy Manager
 
-- [Install Docker](https://docs.docker.com/engine/install/ubuntu/#installation-methods)
+Now, it's time to set up all the necessary tools to deploy, maintain, and expose our services/applications: Docker, Portainer, and Nginx Proxy Manager.
+
+<figure markdown="span">
+  ![Docker, Portainer, and Nginx Proxy Manager](image-17.png)
+  <figcaption>Docker, Portainer, and Nginx Proxy Manager</figcaption>
+</figure>
+
+Let's first install Docker ([official link](https://docs.docker.com/engine/install/ubuntu/#installation-methods), if necessary):
 
 ```bash
-# Add Docker's official GPG key:
+# Add Docker's official GPG key
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add the repository to Apt sources:
+# Add the repository to Apt sources
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -213,38 +220,86 @@ sudo apt-get update
 ```
 
 ```bash
+# Install Docker
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
+
+You can verify the Docker installation using the following command:
 
 ```bash
 sudo docker version
 docker compose version
 ```
 
-- [Install Portainer](https://docs.portainer.io/start/install-ce/server/docker/linux#deployment)
-
 ```bash
-sudo docker volume create portainer_data
+Client: Docker Engine - Community
+ Version:           27.4.1
+ API version:       1.47
+ Go version:        go1.22.10
+ Git commit:        b9d17ea
+ Built:             Tue Dec 17 15:45:46 2024
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          27.4.1
+  API version:      1.47 (minimum version 1.24)
+  Go version:       go1.22.10
+  Git commit:       c710b88
+  Built:            Tue Dec 17 15:45:46 2024
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.7.24
+  GitCommit:        88bf19b2105c8b17560993bee28a01ddc2f97182
+ runc:
+  Version:          1.2.2
+  GitCommit:        v1.2.2-0-g7cb3632
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+Docker Compose version v2.32.1
 ```
 
+Then install Portainer ([official link](https://docs.portainer.io/start/install-ce/server/docker/linux#deployment), if necessary):
+
 ```bash
+# Create Portainer volume
+sudo docker volume create portainer_data
+
+# Pull & Run Portainer
 sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:2.25.1
 ```
 
-Go to https://192.168.1.X:9443
+Once completed, you can **navigate to https://192.168.1.X:9443**. You should be prompted to **create the administrator account**. Once completed and logged in, the following screen should be presented to you:
 
-- [Install Nginx Proxy Manager](https://nginxproxymanager.com/guide/#quick-setup)
+<figure markdown="span">
+  ![Portainer ready!](image-18.png)
+  <figcaption>Portainer ready!</figcaption>
+</figure>
+
+Congratulations, you've successfully installed Portainer! You can now deploy, maintain, and monitor containerized applications through a Web UI.
+
+Finally, let's install Nginx Proxy Manager ([official link](https://nginxproxymanager.com/guide/#quick-setup), if necessary):
 
 ```bash
+# Create Nginx Proxy Manager volumes
 sudo docker volume create nginx_proxy_manager_data
 sudo docker volume create nginx_proxy_manager_etc_letsencrypt
-```
 
-```bash
+# Pull & Run Nginx Proxy Manager
 sudo docker run -d -p 80:80 -p 443:443 -p 81:81 --name nginx_proxy_manager --restart=always -v nginx_proxy_manager_data:/data -v nginx_proxy_manager_etc_letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:2.12.2
 ```
 
-Go to http://192.168.1.X:81
+Once completed, you can **navigate to http://192.168.1.69:81**. The login and password are `admin@example.com` and `changeme`. Once logged in, you will be prompted to change these parameters and will be welcomed with the following screen:
+
+<figure markdown="span">
+  ![Nginx Proxy Manager ready!](image-19.png)
+  <figcaption>Nginx Proxy Manager ready!</figcaption>
+</figure>
+
+Congratulation! you've successfully installed Nginx Proxy Manager! 🤗
 
 ## 🌐 Expose Your Services to the Internet Securely
 
