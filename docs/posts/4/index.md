@@ -192,7 +192,7 @@ myuser@myserver:~$
 
 Then, congratulations! You've successfully set up a server similar to the ones you can rent from AWS or any other cloud provider 🤩.
 
-## Install Docker, Portainer and Nginx Proxy Manager
+## 🐋 Set Up Docker, Portainer, and Nginx Proxy Manager
 
 - [Install Docker](https://docs.docker.com/engine/install/ubuntu/#installation-methods)
 
@@ -246,7 +246,7 @@ sudo docker run -d -p 80:80 -p 443:443 -p 81:81 --name nginx_proxy_manager --res
 
 Go to http://192.168.1.X:81
 
-## Setup to open your services securely to the outside world
+## 🌐 Expose Your Services to the Internet Securely
 
 - Setup your ISP router to forward ports 80 and 443 to your server
 - Get the CNAME or Internet IP of your router
@@ -261,7 +261,7 @@ Go to http://192.168.1.X:81
 - On nginx: Route portainer.mydomain.topleveldomain -> Scheme https / Local network IP / Port 9443 / Block Common Exploits
 - Go to nginx.mydomain.topleveldomain or portainer.mydomain.topleveldomain
 
-## An example with OpenWebUI and Ollama
+## 🎯 Example Use Case: OpenWebUI and Ollama Setup
 
 - From portainer: Select `local` > Go to `Stacks` > Go to `Add stack`
 - For input `Name` put `llm` or an other name
