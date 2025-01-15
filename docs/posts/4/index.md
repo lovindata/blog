@@ -167,7 +167,7 @@ It should give you a list of interfaces. Find the one that has an `inet` address
 ...
 4: wlp4s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
     link/ether xx:xx:xx:xx:xx:xx brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.69/24 metric 600 brd 192.168.1.255 scope global dynamic wlp4s0
+    inet 192.168.1.X/24 metric 600 brd 192.168.1.255 scope global dynamic wlp4s0
        valid_lft 38554sec preferred_lft 38554sec
     inet6 xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx/64 scope global dynamic mngtmpaddr noprefixroute
        valid_lft 86165sec preferred_lft 86165sec
@@ -176,10 +176,10 @@ It should give you a list of interfaces. Find the one that has an `inet` address
 ...
 ```
 
-So in my case it looks like, it is `192.168.1.69`.
+Let's connect via SSH.
 
 ```bash title="From work machine"
-ssh myuser@192.168.1.69
+ssh myuser@192.168.1.X
 ```
 
 If it connects:
@@ -292,7 +292,7 @@ sudo docker volume create nginx_proxy_manager_etc_letsencrypt
 sudo docker run -d -p 80:80 -p 443:443 -p 81:81 --name nginx_proxy_manager --restart=always -v nginx_proxy_manager_data:/data -v nginx_proxy_manager_etc_letsencrypt:/etc/letsencrypt jc21/nginx-proxy-manager:2.12.2
 ```
 
-Once completed, you can **navigate to http://192.168.1.69:81**. The login and password are `admin@example.com` and `changeme`. Once logged in, you will be prompted to change these parameters and will be welcomed with the following screen:
+Once completed, you can **navigate to http://192.168.1.X:81**. The login and password are `admin@example.com` and `changeme`. Once logged in, you will be prompted to change these parameters and will be welcomed with the following screen:
 
 <figure markdown="span">
   ![Nginx Proxy Manager ready!](image-19.png)
@@ -303,23 +303,65 @@ Congratulation! you've successfully installed Nginx Proxy Manager! 🤗
 
 ## 🌐 Expose Your Services to the Internet Securely
 
+In this section, we are going to expose Nginx Proxy Manager and Portainer to the outside world. The goal is to be able to manage, deploy, and maintain our services from anywhere! In this part, depending on your ISP and domain name provider, it's highly likely that you do not have exactly the same screens.
+
 <figure markdown="span">
-  ![Nginx Proxy Manager ready!](image-20.png)
-  <figcaption>Nginx Proxy Manager ready!</figcaption>
+  ![Exposing Nginx Proxy Manager and Portainer to the outside world](image-20.png)
+  <figcaption>Exposing Nginx Proxy Manager and Portainer to the outside world</figcaption>
 </figure>
 
-- Setup your ISP router to forward ports 80 and 443 to your server
-- Get the CNAME or Internet IP of your router
-- Get the Local network IP of your server (ip a on the server)
-- Buy a domain name
-- On domain provider site: Route @ -> CNAME or Internet IP
-- On domain provider site: Route nginx -> CNAME or Internet IP
-- On domain provider site: Route portainer -> CNAME or Internet IP
-- On nginx > SSL certificates > Add SSL certificate > Domain Names = nginx.mydomain.topleveldomain > I Agree to the Let's Encrypt Terms of Service > Save
-- Same as just above but for portainer
-- On nginx: Route nginx.mydomain.topleveldomain -> Scheme http / Local network IP / Port 81 / Block Common Exploits
-- On nginx: Route portainer.mydomain.topleveldomain -> Scheme https / Local network IP / Port 9443 / Block Common Exploits
-- Go to nginx.mydomain.topleveldomain or portainer.mydomain.topleveldomain
+!!! warning
+
+    Beware, exposing Nginx Proxy Manager and Portainer allows people to attempt to **crack your login/password**. If they succeed, it means they have **control over the deployed applications**. So, if working from home is the only thing you do, it might be wise not to expose these two services and to only access them from your home network!
+
+Let's start by **forwarding ports 80 and 443 requests from our ISP router to our server's ports 80 and 443**:
+
+<figure markdown="span">
+  ![Forwarding ports 80 and 443 requests](image-21.png)
+  <figcaption>Forwarding ports 80 and 443 requests</figcaption>
+</figure>
+
+Let's now **get the CNAME or router's Internet IP**:
+
+<figure markdown="span">
+  ![Getting CNAME or router Internet IP](image-22.png)
+  <figcaption>Forwarding ports 80 and 443 requests</figcaption>
+</figure>
+
+!!! note
+
+    You can also go to sites like [whatismyip.com](https://www.whatismyip.com/) to get your IP.
+
+Now let's **buy a domain name**. In my case I choosed [namecheap.com](https://www.namecheap.com). After buying the domain name, let's **configure it to be routed to our ISP router**.
+
+<figure markdown="span">
+  ![Domain routing](image-23.png)
+  <figcaption>Domain routing</figcaption>
+</figure>
+
+!!! Note
+
+    You can also route to your ISP router using the IP address instead of the CNAME.
+
+!!! Note
+
+    Host means the subdomain name. For example, with a host of `nginx`, it will route the domain `nginx.mydomain.topdomain` to your ISP router.
+
+Let's go back to our home network and **configure Nginx to allow requests from these domains to our services**. We will use the example of Nginx Proxy Manager itself:
+
+<figure markdown="span">
+  ![Configure your "Let's Encrypt" SSL certificate for your domain](image-24.png)
+  <figcaption>Configure your "Let's Encrypt" SSL certificate for your domain</figcaption>
+</figure>
+
+<figure markdown="span">
+  !["Add Proxy Host" to the corresponding service with "Force SSL" and the appropriate SSL certificate](image-25.png)
+  <figcaption>"Add Proxy Host" to the corresponding service with "Force SSL" and the appropriate SSL certificate</figcaption>
+</figure>
+
+The **same steps can be applied to Portainer**, but be sure to use `https` as the `Scheme` when adding the proxy host, because the Portainer service uses https by default.
+
+**Going to "nginx.mydomain.topdomain" and "portainer.mydomain.topdomain", you should be able to access** your two services! Congratulations, you've learned how to expose your services to the Internet! 🎉
 
 ## 🎯 Example Use Case: OpenWebUI and Ollama Setup
 
