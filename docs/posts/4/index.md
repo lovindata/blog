@@ -8,9 +8,7 @@ categories:
   - DevOps
 ---
 
-As a software engineer, I’ve long relied on [AWS for cloud computing](https://aws.amazon.com/ec2/?nc2=h_ql_prod_cp_ec2), but escalating costs prompted a reevaluation 💸. Black Friday deals just a few months ago presented an opportunity I couldn’t ignore 🎉. I invested in a [GMKtec mini PC](https://www.gmktec.com/?spm=..product_397345ec-b381-4f76-83dc-9cb6156546ee.header_1.1&spm_prev=..collection_72f4817e-5a65-4acf-bdbd-06cc49c42783.header_1.1) powered by an [AMD Ryzen 7 8845HS](https://www.gmktec.com/products/amd-ryzen-7-8845hs-mini-pc-nucbox-k8-plus?spm=..collection_72f4817e-5a65-4acf-bdbd-06cc49c42783.header_1.1&spm_prev=..product_fcda073f-26cd-4db0-8dc4-22bf93d4f8f7.header_1.1), coupled with 2 x [48GB of DDR5 5600MHz Crucial RAM](https://www.crucial.fr/memory/ddr5/CT48G56C46S5) and two [4TB Samsung 990 PRO PCIe 4.0 NVMe M.2 SSDs](https://www.samsung.com/fr/memory-storage/nvme-ssd/990-pro-4tb-nvme-pcie-gen-4-mz-v9p4t0bw/). For €1,100 (around $1,200 USD), I built a system that consumes only 35W ⚡, translating to about **€4.30 ($4.60 USD) per month** in electricity costs in France 🇫🇷. In contrast, running an [AWS EC2 instance like m8g.4xlarge costs $0.71808](https://aws.amazon.com/fr/ec2/pricing/on-demand/) per hour—approximately **$525 per month** if used continuously 💻.
-
-This compact powerhouse offers **16 CPUs (8 cores, 16 threads) 💻, 96GB of high-speed RAM ⚙️, and 8TB of blazing-fast PCIe 4.0 NVMe storage 💾**, making it ideal for demanding workloads. This setup not only offers immense savings 💰 but also provides the perfect foundation for a home lab powered by [Ubuntu Server 🐧](https://ubuntu.com/download/server). I’ll be using tools like [Portainer](https://www.portainer.io/) for container management 🛠️ and [Nginx Proxy Manager](https://nginxproxymanager.com/) to handle reverse proxy configurations with ease 🔄. Here’s how I made the transition—and why it’s worth considering for anyone looking to escape spiraling cloud costs 🚀.
+As a software engineer, I’ve long relied on [AWS for cloud computing](https://aws.amazon.com/ec2/?nc2=h_ql_prod_cp_ec2), but escalating costs prompted a reevaluation 💸. Black Friday deals just a few months ago presented an opportunity I couldn’t ignore 🎉. I invested in a [GMKtec mini PC](https://www.gmktec.com/?spm=..product_397345ec-b381-4f76-83dc-9cb6156546ee.header_1.1&spm_prev=..collection_72f4817e-5a65-4acf-bdbd-06cc49c42783.header_1.1) powered by an [AMD Ryzen 7 8845HS](https://www.gmktec.com/products/amd-ryzen-7-8845hs-mini-pc-nucbox-k8-plus?spm=..collection_72f4817e-5a65-4acf-bdbd-06cc49c42783.header_1.1&spm_prev=..product_fcda073f-26cd-4db0-8dc4-22bf93d4f8f7.header_1.1), coupled with 2 x [48GB of DDR5 5600MHz Crucial RAM](https://www.crucial.fr/memory/ddr5/CT48G56C46S5) and two [4TB Samsung 990 PRO PCIe 4.0 NVMe M.2 SSDs](https://www.samsung.com/fr/memory-storage/nvme-ssd/990-pro-4tb-nvme-pcie-gen-4-mz-v9p4t0bw/). For €1,100 (around $1,200 USD), I built a system that consumes only 35W ⚡, translating to about **€4.30 ($4.60 USD) per month** in electricity costs in France 🇫🇷. In contrast, running an [AWS EC2 instance like m8g.4xlarge costs $0.71808](https://aws.amazon.com/fr/ec2/pricing/on-demand/) per hour—approximately **$525 per month** if used continuously 💻. This compact powerhouse offers **16 CPUs (8 cores, 16 threads) 💻, 96GB of high-speed RAM ⚙️, and 8TB of blazing-fast PCIe 4.0 NVMe storage 💾**, making it ideal for demanding workloads. This setup not only offers immense savings 💰 but also provides the perfect foundation for a home lab powered by [Ubuntu Server 🐧](https://ubuntu.com/download/server). I’ll be using tools like [Portainer](https://www.portainer.io/) for container management 🛠️ and [Nginx Proxy Manager](https://nginxproxymanager.com/) to handle reverse proxy configurations with ease 🔄. Here’s how I made the transition—and why it’s worth considering for anyone looking to escape spiraling cloud costs 🚀.
 
 <!-- more -->
 
@@ -355,21 +353,31 @@ Let's go back to our home network and **configure Nginx to allow requests from t
 </figure>
 
 <figure markdown="span">
-  !["Add Proxy Host" to the corresponding service with "Force SSL" and the appropriate SSL certificate](image-25.png)
-  <figcaption>"Add Proxy Host" to the corresponding service with "Force SSL" and the appropriate SSL certificate</figcaption>
+  !["Add Proxy Host" to the corresponding service with "Force SSL" and the corresponding SSL certificate](image-25.png)
+  <figcaption>"Add Proxy Host" to the corresponding service with "Force SSL" and the corresponding SSL certificate</figcaption>
 </figure>
 
 The **same steps can be applied to Portainer**, but be sure to use `https` as the `Scheme` when adding the proxy host, because the Portainer service uses https by default.
 
 **Going to "nginx.mydomain.topdomain" and "portainer.mydomain.topdomain", you should be able to access** your two services! Congratulations, you've learned how to expose your services to the Internet! 🎉
 
-## 🎯 Example Use Case: OpenWebUI and Ollama Setup
+## 🎯 Example Use Case: Open WebUI and Ollama Setup
 
-- From portainer: Select `local` > Go to `Stacks` > Go to `Add stack`
-- For input `Name` put `llm` or an other name
-- Select `Web editor` and paste the docker following docker compose file
+This section aims to demonstrate how to properly install a stack of containers for a given application and expose it to the Internet. [LLMs](https://en.wikipedia.org/wiki/Large_language_model) are hot topics nowadays, so let's use the [Open WebUI](https://openwebui.com/) and [Ollama](https://ollama.com/) stack as an example.
 
-```yml
+<figure markdown="span">
+  ![Open WebUI and Ollama Setup](image-26.png)
+  <figcaption>Open WebUI and Ollama Setup</figcaption>
+</figure>
+
+Let's start by running the LLM container stack on our server. Here are the steps:
+
+- Navigate to the Portainer home page.
+- Select the `Local` environment, go to `Stacks`, and click on `Add stack`.
+- Input a `Name` for the stack, for example, `llm`.
+- Select `Web editor` and paste the following Docker Compose file.
+
+```yaml
 services:
   # https://github.com/open-webui/open-webui
   openwebui:
@@ -411,12 +419,47 @@ volumes:
     driver: local
 ```
 
-- In `Environment variables` section, click on `Add an environement variables` two times
-- Add the two following environement variables
-  - `OPENWEBUI_PORT` with the value `11435`
-  - `OLLAMA_PORT` with the value `11434`
-- Click on Deploy the stack
-- On domain provider site: Route llm -> CNAME or Internet IP
-- On nginx > SSL certificates > Add SSL certificate > Domain Names = llm.mydomain.topleveldomain > I Agree to the Let's Encrypt Terms of Service > Save
-- On nginx: Route llm.mydomain.topleveldomain -> Scheme https / Local network IP / Port 11435 / Block Common Exploits / Websockets Support
-- Go to llm.mydomain.topleveldomain
+- In the `Environment variables` section, add the following environment variables: `OPENWEBUI_PORT -> 11435` and `OLLAMA_PORT -> 11434`.
+
+You should end up with a configuration that looks like this:
+
+<figure markdown="span">
+  ![Configuring the Open WebUI and Ollama stack](image-27.png)
+  <figcaption>Configuring the Open WebUI and Ollama stack</figcaption>
+</figure>
+
+Let's now expose our application to the outside world. To be precise, it means exposing the Open WebUI service. This part is identical to when Nginx Proxy Manager and Portainer were exposed, so I invite you to **check the [previous part](#-expose-your-services-to-the-internet-securely)**. The important part is to **expose only the Open WebUI and enable `Websockets Support`** because text writing on the fly is done through a websocket. After that, you should be able to **navigate to 'llm.mydomain.topdomain'**, and by **configuring your admin account (mandatory on first page load)**, you should end up on the following page:
+
+<figure markdown="span">
+  ![Open WebUI](image-28.png)
+  <figcaption>Open WebUI</figcaption>
+</figure>
+
+Let's now download the latest [Phi-4](https://ollama.com/library/phi4) with its 14 billion parameters, rumored to rival [OpenAI's GPT-4o mini](https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/), which everyone is talking about. You can also try other LLMs instead; models are available in the [Ollama Models section](https://ollama.com/search).
+
+<figure markdown="span">
+  ![The Phi-4 model](image-29.png)
+  <figcaption>The Phi-4 model</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Downloading the Phi-4 model](image-30.png)
+  <figcaption>Downloading the Phi-4 model</figcaption>
+</figure>
+
+Here is an example result of prompting:
+
+<figure markdown="span">
+  ![An example of a prompt result](image-31.png)
+  <figcaption>An example of a prompt result</figcaption>
+</figure>
+
+The latest Phi is running on our server, though it's currently best suited for background tasks due to its slower performance. 🎉 Congratulations! You've successfully self-hosted your own private LLM platform! 🚀
+
+## 🔮 What's next?
+
+My thoughts are that **self-hosting is ideal for ephemeral computation or data**. It's great because, as we can see, it’s more than doable, and when compared to cloud prices, it's less costly. However, running a full business on a self-hosted lab isn't ideal. My home isn’t "secure". So, if **user data is critical to the application, I would rent persistent services like [RDS](https://aws.amazon.com/rds/), [S3](https://aws.amazon.com/s3/), etc**. But for all the **application logic and computation, since it's ephemeral**, I would go the **self-hosting route**.
+
+Regarding the technical/hardware side, I might buy another mini PC to set up a [K8S](https://kubernetes.io/) cluster. Alternatively, I’m considering the new [Intel Arc Battlemage GPUs](https://www.intel.com/content/www/us/en/newsroom/news/intel-launches-arc-b-series-graphics-cards.html) that just got released. The [GMKTec AMD Ryzen 7 8845HS Mini PC—NucBox K8 Plus](https://www.gmktec.com/collections/amd-mini-pc/products/amd-ryzen-7-8845hs-mini-pc-nucbox-k8-plus?spm=..collection_48a90fc4-e985-456a-b599-fb6d33eaa7be.collection_1.3&spm_prev=..index.header_1.1) I have even has an [Oculink](https://www.delock.com/infothek/OCuLink/oculink_e.html) port, héhé! Or maybe I’ll go for both options—imagine a [K8S cluster with GPU enabled](https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/) on each node 🤤. We’ll see!
+
+I try to write monthly on the [LovinData Blog](https://lovindata.github.io/blog/) and on [Medium](https://medium.com/@jamesjg), and like to give back the knowledge I've learned. So don't hesitate to reach out; I'm always available to chat about nerdy stuff 🤗! Here are my socials: [LinkedIn](https://www.linkedin.com/in/james-jiang-87306b155/), [Twitter](https://twitter.com/jamesjg_) and [Reddit](https://www.reddit.com/user/lovindata/). Otherwise, let's learn together in the next story 🫡! Bye ❤️.
